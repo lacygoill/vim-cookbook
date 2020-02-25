@@ -1,6 +1,6 @@
-if exists('g:charblob_loaded')
-  finish
+if exists('g:test_lua_loaded')
+    finish
 endif
-let g:charblob_loaded = 1
+let g:test_lua_loaded = 1
 
-command MakeCharBlob :call charblob#encode_buffer()
+com TestLua call test#func()
