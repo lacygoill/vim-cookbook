@@ -1,7 +1,8 @@
-" if exists('g:test_lua_loaded')
+if exists('g:test_lua_loaded')
     finish
-" endif
+endif
 let g:test_lua_loaded = 1
 
-com TestLuaRequireExample call test#replace_lines()
-com TestLuaOpenWin call test#open_win()
+com TestLuaRequireExample call test#substitute()
+com TestLuaFloatWindowRelative call test#float_window_relative()
+com TestLuaFloatBufferRelative call test#float_buffer_relative()
