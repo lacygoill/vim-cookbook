@@ -1,4 +1,4 @@
-fu luatest#substitute() abort "{{{1
+fu cookbook#lua#substitute(lnum1, lnum2) abort "{{{1
     " Purpose: replace each line in the buffer with a sentence describing the number of characters it contained
     " See: `:h lua-require-example`.
     " What is the purpose of{{{
@@ -32,12 +32,12 @@ fu luatest#substitute() abort "{{{1
     "     command! -nargs=1 Watch call luaeval('watch_file(_A)', expand('<args>'))")
     "                                                            ^^^^^^^^^^^^^^^^
     "}}}
-    call setline(1, luaeval(
+    call setline(a:lnum1, luaeval(
         \ 'require("substitute").new_lines(unpack(_A))',
-        \ ['there were %d characters on this line', getline(1, '$')]))
+        \ ['there were %d characters on this line', getline(a:lnum1, a:lnum2)]))
 endfu
 
-fu luatest#float_window_relative() "{{{1
+fu cookbook#lua#float_window_relative() "{{{1
     " Purpose: open a window-relative float.{{{
     "
     " You can see such a float as being "attached" to a window position.
@@ -46,7 +46,7 @@ fu luatest#float_window_relative() "{{{1
     call luaeval('require("float/window_relative").main()')
 endfu
 
-fu luatest#float_buffer_relative() "{{{1
+fu cookbook#lua#float_buffer_relative() "{{{1
     " Purpose: open a buffer-relative float.{{{
     "
     " You can see such a float as being "attached" to a buffer position.
