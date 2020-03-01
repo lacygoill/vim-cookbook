@@ -1,4 +1,4 @@
-fu test#substitute() abort "{{{1
+fu luatest#substitute() abort "{{{1
     " Purpose: replace each line in the buffer with a sentence describing the number of characters it contained
     " See: `:h lua-require-example`.
     " What is the purpose of{{{
@@ -37,7 +37,7 @@ fu test#substitute() abort "{{{1
         \ ['there were %d characters on this line', getline(1, '$')]))
 endfu
 
-fu test#float_window_relative() "{{{1
+fu luatest#float_window_relative() "{{{1
     " Purpose: open a window-relative float.{{{
     "
     " You can see such a float as being "attached" to a window position.
@@ -46,7 +46,7 @@ fu test#float_window_relative() "{{{1
     call luaeval('require("float/window_relative").main()')
 endfu
 
-fu test#float_buffer_relative() "{{{1
+fu luatest#float_buffer_relative() "{{{1
     " Purpose: open a buffer-relative float.{{{
     "
     " You can see such a float as being "attached" to a buffer position.
