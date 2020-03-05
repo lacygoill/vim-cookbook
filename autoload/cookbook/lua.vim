@@ -1,6 +1,11 @@
-fu cookbook#lua#substitute(lnum1, lnum2) abort "{{{1
+fu cookbook#lua#substitute() abort "{{{1
     " Purpose: replace each line in the buffer with a sentence describing the number of characters it contained
     " See: `:h lua-require-example`.
+    let tempfile = tempname()
+    exe 'sp '..tempfile..'.before'
+    call setline(1, split('the quick brown fox jumps over the lazy dog'))
+    let lines = getline(1, '$')
+    exe 'vs '..tempfile..'.after'
     " What is the purpose of{{{
     "}}}
     "   `require()`?{{{
@@ -22,8 +27,8 @@ fu cookbook#lua#substitute(lnum1, lnum2) abort "{{{1
     " It refers to the second optional argument of `luaeval()`.
     " Here, it's a list containing these 2 VimL expressions:
     "
-    "    - `'there were %d characters on this line'`
-    "    - `getline(1, '$')`
+    "    - the string `'there were %d characters on this line'`
+    "    - the variable `lines` containing a list of strings
     "
     " It doesn't need to be a list though.
     " It can be a simple scalar too, like a string.
@@ -32,8 +37,8 @@ fu cookbook#lua#substitute(lnum1, lnum2) abort "{{{1
     "     command! -nargs=1 Watch call luaeval('watch_file(_A)', expand('<args>'))")
     "                                                            ^^^^^^^^^^^^^^^^
     "}}}
-    call setline(a:lnum1, luaeval(
+    call setline(1, luaeval(
         \ 'require("substitute").new_lines(unpack(_A))',
-        \ ['there were %d characters on this line', getline(a:lnum1, a:lnum2)]))
+        \ ['"%s" contains %d characters', lines]))
 endfu
 
