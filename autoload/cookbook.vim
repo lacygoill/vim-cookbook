@@ -26,6 +26,11 @@ let g:autoloaded_cookbook = 1
 " Note that  a single  recipe may  be implemented via  several files  written in
 " different  languages.  When  you add  a recipe  to the  db, put  it under  the
 " language in which its interface is written.
+"
+" ---
+"
+" Also, this allows us to get more meaningful recipes when tab completing `:Cookbook`,
+" or just when executing the command without arguments to populate the qfl.
 "}}}
 const s:DB = {
     \ 'vim': {
@@ -251,5 +256,13 @@ endfu
 fu s:is_already_displayed(file) abort "{{{2
     let files_in_tab = map(tabpagebuflist(), {_,v -> fnamemodify(bufname(v), ':p')})
     return index(files_in_tab, a:file) != -1
+endfu
+
+fu cookbook#notify(msg, ...) abort "{{{2
+    try
+        call call('lg#popup#notification', [a:msg] + a:000)
+    catch /^Vim\%((\a\+)\)\=:E117:/
+        call cookbook#error('need lg#popup#notification(); install vim-lg-lib')
+    endtry
 endfu
 

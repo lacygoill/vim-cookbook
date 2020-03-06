@@ -7,10 +7,11 @@ fu cookbook#math#is_prime() abort "{{{1
     " Purpose: test whether a number is prime
     let n = 1223
     if s:is_prime(n)
-        echo n..' is prime'
+        let msg = n..' is prime'
     else
-        echo n..' is not prime'
+        let msg = n..' is not prime'
     endif
+    call cookbook#notify(msg)
 endfu
 
 fu s:is_prime(n) abort
@@ -119,7 +120,8 @@ fu cookbook#math#read_number() abort "{{{1
     "     one hundred twenty three~
     "}}}
     let n = 1234
-    echo s:read_number(n)
+    let msg = printf("in english, %d can be read as\n%s", n, s:read_number(n))
+    call cookbook#notify(msg, {'time': 5000})
 endfu
 
 fu s:read_number(n) abort
@@ -221,7 +223,8 @@ fu cookbook#math#transpose_table() abort "{{{1
     " the columns in the original one.
     "}}}
     let lists = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-    echo call('s:transpose_table', lists)
+    let msg = printf("the transposition of:\n    %s\nis:\n    %s", lists, call('s:transpose_table', lists))
+    call cookbook#notify(msg, {'time': 5000})
 endfu
 
 fu s:transpose_table(...) abort

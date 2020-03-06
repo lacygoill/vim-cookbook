@@ -25,7 +25,7 @@ fu s:echo_choice(line) abort "{{{2
     try
         call lg#popup#notification(msg)
     catch /^Vim\%((\a\+)\)\=:E117:/
-        call cookbook#util#error('need lg#popup#notification(); install vim-lg-lib')
+        call cookbook#error('need lg#popup#notification(); install vim-lg-lib')
     endtry
 endfu
 
