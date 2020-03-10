@@ -84,6 +84,15 @@ const s:DB = {
     \         'desc': 'create a floating window relative to the current buffer',
     \     },
     \ },
+    \ 'git': {
+    \     'BisectWithScript': {
+    \         'sources': [
+    \             {'funcname': '', 'path': 'autoload/cookbook/git/bisect/win_gettype', 'ft': 'sh'},
+    \             {'funcname': '', 'path': 'autoload/cookbook/git/bisect/win_gettype.vim', 'ft': 'vim'},
+    \         ],
+    \         'desc': 'bisect a commit automatically using a shell script',
+    \     },
+    \ },
     \ }
 let s:_ = map(keys(s:DB), {_,v -> {v : keys(s:DB[v])}})
 let s:RECIPES = {} | call map(s:_, {_,v -> extend(s:RECIPES, v)}) | lockvar! s:RECIPES
@@ -93,17 +102,25 @@ const s:SFILE = expand('<sfile>:p')
 const s:SROOTDIR = expand('<sfile>:p:h:h')
 
 " Interface {{{1
-fu cookbook#main(recipe) abort "{{{2
-    if a:recipe is# ''
-        return s:populate_qfl_with_recipes()
-    elseif a:recipe is# '-check_db_integrity'
-        return s:check_db_integrity()
+fu cookbook#main(args) abort "{{{2
+    let lang = s:get_curlang(a:args)
+    let recipe = s:get_recipe(a:args)
+    if recipe is# ''
+        return s:populate_qfl_with_recipes(lang)
+    elseif recipe is# '-check_db'
+        return s:check_db()
     endif
-    let lang = s:get_curlang()
-    if s:is_invalid(a:recipe, lang) | return | endif
-    let sources = s:get_sources(a:recipe, lang)
+    if s:is_invalid(recipe, lang) | return | endif
+    let sources = s:get_sources(recipe, lang)
     call s:show_me_the_code(sources)
-    let funcname = s:DB[lang][a:recipe].sources[0].funcname
+    " TODO: Support languages other than Vim.{{{
+    "
+    " If your recipe is written in awk, there won't be any Vim function to invoke.
+    " You'll probably just want to run  the script and see its result/output (in
+    " a popup terminal?).
+    "}}}
+    if lang isnot# 'vim' | return | endif
+    let funcname = s:DB[lang][recipe].sources[0].funcname
     try
         call s:running_code_failed(funcname)
     catch
@@ -111,21 +128,22 @@ fu cookbook#main(recipe) abort "{{{2
     endtry
 endfu
 
-fu cookbook#complete(_a, _l, _p) abort "{{{2
-    let matches = []
-    let curlang = s:get_curlang()
-    let matches = get(s:RECIPES, curlang, [])
-    return join(matches + ['-check_db_integrity'], "\n")
+fu cookbook#complete(arglead, cmdline, pos) abort "{{{2
+    let word_before_cursor = matchstr(a:cmdline, '.*\s\zs-\S.*\%'..a:pos..'c.')
+    if word_before_cursor =~# '\C^-lang\s*\S*$'
+        return join(keys(s:DB), "\n")
+    elseif a:arglead[0] is# '-'
+        let options = ['-check_db', '-lang']
+        return join(options, "\n")
+    else
+        let curlang = s:get_curlang(a:cmdline)
+        let matches = get(s:RECIPES, curlang, [])
+        return join(matches, "\n")
+    endif
 endfu
 "}}}1
 " Core {{{1
 fu s:running_code_failed(funcname) abort "{{{2
-    " TODO: Support languages other than Vim.{{{
-    "
-    " If your recipe is written in awk, there won't be any Vim function to invoke.
-    " You'll probably just want to run  the script and see its result/output (in
-    " a popup terminal?).
-    "}}}
     try
         call call(a:funcname, [])
     catch /^Vim\%((\a\+)\)\=:E119:/
@@ -146,22 +164,23 @@ fu s:show_me_the_code(sources) abort "{{{2
         endif
         exe cmd..' '..source.path
         if i == 1 | let first_win_open = winnr() | endif
-        let func_pat = s:get_func_pat(source.funcname, source.ft)
-        exe '/'..func_pat
+        if source.funcname !=# ''
+            let func_pat = s:get_func_pat(source.funcname, source.ft)
+            exe '/'..func_pat
+        endif
         norm! zMzv
     endfor
     if exists('first_win_open') | exe first_win_open..'wincmd w' | endif
 endfu
 
-fu s:populate_qfl_with_recipes() abort "{{{2
-    let lang = s:get_curlang()
-    let qfl = map(deepcopy(s:RECIPES[lang]), {_,v -> {
-        \ 'bufnr': bufadd(s:SROOTDIR..'/'..s:DB[lang][v].sources[0].path),
+fu s:populate_qfl_with_recipes(lang) abort "{{{2
+    let qfl = map(deepcopy(s:RECIPES[a:lang]), {_,v -> {
+        \ 'bufnr': bufadd(s:SROOTDIR..'/'..s:DB[a:lang][v].sources[0].path),
         \ 'module': v,
-        \ 'text': s:DB[lang][v].desc,
-        \ 'pattern': s:DB[lang][v].sources[0].funcname,
+        \ 'text': s:DB[a:lang][v].desc,
+        \ 'pattern': s:DB[a:lang][v].sources[0].funcname,
         \ }})
-    call setqflist([], ' ', {'items': qfl, 'title': ':Cookbook'})
+    call setqflist([], ' ', {'items': qfl, 'title': ':Cookbook -lang '..a:lang})
     cw
     if &bt isnot# 'quickfix' | return | endif
     call s:conceal_noise()
@@ -169,7 +188,7 @@ fu s:populate_qfl_with_recipes() abort "{{{2
         au!
         au BufWinEnter <buffer> call s:conceal_noise()
     augroup END
-    nno <buffer><nowait><silent> z<cr> :<c-u>call <sid>qf_run_recipe()<cr>
+    nno <buffer><nowait><silent> <cr> :<c-u>call <sid>qf_run_recipe()<cr>
 endfu
 
 fu s:conceal_noise() abort "{{{2
@@ -178,12 +197,14 @@ fu s:conceal_noise() abort "{{{2
 endfu
 
 fu s:qf_run_recipe() abort "{{{2
-    let curwin = winnr()
-    exe 'Cookbook '..matchstr(getline('.'), '\S\+')
-    exe curwin..'close'
+    let recipe = matchstr(getline('.'), '\S\+')
+    close
+    let title = getqflist({'title': 0}).title
+    let cmd = title..' '..recipe
+    exe cmd
 endfu
 
-fu s:check_db_integrity() abort "{{{2
+fu s:check_db() abort "{{{2
     let report = []
     " iterate over languages
     for l in keys(s:RECIPES)
@@ -196,6 +217,7 @@ fu s:check_db_integrity() abort "{{{2
                 if !filereadable(file)
                     let report += [printf('    %s: "%s" is not readable', r, file)]
                 else
+                    if s.funcname is# '' | continue | endif
                     let func_pat = s:get_func_pat(s.funcname, s.ft)
                     if match(readfile(file), func_pat) == -1
                         let report += [printf('    %s: the function "%s" is not defined in "%s"', r, s.funcname, file)]
@@ -224,16 +246,28 @@ endfu
 fu s:is_invalid(recipe, lang) abort "{{{2
     if !(has_key(s:DB, a:lang) && has_key(s:DB[a:lang], a:recipe))
         return cookbook#error(a:recipe..' is not a known recipe')
-    elseif s:DB[a:lang][a:recipe].env is# 'vim' && has('nvim')
-        return cookbook#error('this recipe only works in Vim')
-    elseif s:DB[a:lang][a:recipe].env is# 'nvim' && !has('nvim')
-        return cookbook#error('this recipe only works in Neovim')
+    elseif a:lang is# 'vim'
+        if s:DB.vim.[a:recipe].env is# 'vim' && has('nvim')
+            return cookbook#error('this recipe only works in Vim')
+        elseif s:DB.vim.[a:recipe].env is# 'nvim' && !has('nvim')
+            return cookbook#error('this recipe only works in Neovim')
+        endif
     endif
     return 0
 endfu
 
-fu s:get_curlang() abort "{{{2
-    return &ft isnot# '' && has_key(s:RECIPES, &ft) ? &ft : 'vim'
+fu s:get_curlang(args) abort "{{{2
+    if a:args =~# '\C\%(^\|\s\)-lang\s'
+        return matchstr(a:args, '-lang\s\+\zs\S\+')
+    elseif &ft isnot# '' && has_key(s:RECIPES, &ft)
+        return &ft
+    else
+        return 'vim'
+    endif
+endfu
+
+fu s:get_recipe(recipe) abort "{{{2
+    return substitute(a:recipe, '-lang\s\+\S\+\s*', '', '')
 endfu
 
 fu s:get_sources(recipe, lang) abort "{{{2
@@ -243,14 +277,14 @@ fu s:get_sources(recipe, lang) abort "{{{2
 endfu
 
 fu s:get_func_pat(funcname, ft) abort "{{{2
-    return '^\s*'
-        \ ..get({
-        \     'vim': 'fu\%[nction]!\=',
-        \     'nvim': 'fu\%[nction]!\=',
-        \     '(n)vim': 'fu\%[nction]!\=',
-        \     'lua': 'local\s\+function',
+    let kwd = get({
+        \ 'vim': 'fu\%[nction]!\=',
+        \ 'nvim': 'fu\%[nction]!\=',
+        \ '(n)vim': 'fu\%[nction]!\=',
+        \ 'lua': 'local\s\+function',
+        \ 'sh': '',
         \ }, a:ft, '')
-        \ ..'\s\+'..a:funcname..'('
+    return '^\s*'..kwd..(kwd is# '' ? '\s*' : '\s\+')..a:funcname..'('
 endfu
 
 fu s:is_already_displayed(file) abort "{{{2

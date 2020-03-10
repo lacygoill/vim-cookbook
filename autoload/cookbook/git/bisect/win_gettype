@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Purpose: Find out the first commit from which Vim supports the `win_gettype()` function.
+# Usage:{{{
+#
+#     # run this command first! (it can change the commit you're currently on)
+#     $ git bisect reset
+#     $ git bisect start
+#     $ git checkout vA.B.C
+#     $ git bisect new
+#     $ git checkout vD.E.F
+#     $ git bisect old
+#     $ git bisect run /path/to/win_gettype
+#}}}
+
+make clean
+make distclean
+./configure --with-features=huge
+# Why `125`?{{{
+#
+# If the compilation  fails, we don't want `git-bisect(1)` to  interpret that as
+# meaning that Vim exhibits the new behavior whose origin we're trying to bisect.
+# We want it to skip the commit.
+#
+# From `man git-bisect /special exit code`:
+#
+# >   The special exit code 125 should be used when the current source code
+# >   cannot be tested. If the script exits with this code, the current
+# >   revision will be skipped.
+#}}}
+make || exit 125
+./src/vim -Nu NONE -U NONE -i NONE -S /path/to/win_gettype.vim
