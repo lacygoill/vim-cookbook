@@ -247,9 +247,9 @@ fu s:is_invalid(recipe, lang) abort "{{{2
     if !(has_key(s:DB, a:lang) && has_key(s:DB[a:lang], a:recipe))
         return cookbook#error(a:recipe..' is not a known recipe')
     elseif a:lang is# 'vim'
-        if s:DB.vim.[a:recipe].env is# 'vim' && has('nvim')
+        if s:DB.vim[a:recipe].env is# 'vim' && has('nvim')
             return cookbook#error('this recipe only works in Vim')
-        elseif s:DB.vim.[a:recipe].env is# 'nvim' && !has('nvim')
+        elseif s:DB.vim[a:recipe].env is# 'nvim' && !has('nvim')
             return cookbook#error('this recipe only works in Neovim')
         endif
     endif
