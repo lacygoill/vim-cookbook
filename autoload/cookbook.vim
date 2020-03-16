@@ -34,6 +34,13 @@ let g:autoloaded_cookbook = 1
 "}}}
 const s:DB = {
     \ 'vim': {
+    \     'FloatTerminal': {
+    \         'env': 'nvim',
+    \         'sources': [
+    \             {'funcname': 'cookbook#float#terminal#main', 'path': 'autoload/cookbook/float/terminal.vim', 'ft': 'vim'},
+    \         ],
+    \         'desc': 'create a floating terminal',
+    \     },
     \     'FzfBasic': {
     \         'env': '(n)vim',
     \         'sources': [{'funcname': 'cookbook#fzf#basic', 'path': 'autoload/cookbook/fzf.vim', 'ft': 'vim'}],
@@ -43,6 +50,22 @@ const s:DB = {
     \         'env': '(n)vim',
     \         'sources': [{'funcname': 'cookbook#fzf#color', 'path': 'autoload/cookbook/fzf.vim', 'ft': 'vim'}],
     \         'desc': 'filter some output via fzf, coloring some part of it',
+    \     },
+    \     'LuaFloatBufferRelative': {
+    \         'env': 'nvim',
+    \         'sources': [
+    \             {'funcname': 'cookbook#lua#float#buffer_relative#main', 'path': 'autoload/cookbook/lua/float/buffer_relative.vim', 'ft': 'vim'},
+    \             {'funcname': 'main', 'path': 'lua/float/buffer_relative.lua', 'ft': 'lua'},
+    \         ],
+    \         'desc': 'create a floating window relative to the current buffer',
+    \     },
+    \     'LuaFloatWindowRelative': {
+    \         'env': 'nvim',
+    \         'sources': [
+    \             {'funcname': 'cookbook#lua#float#window_relative#main', 'path': 'autoload/cookbook/lua/float/window_relative.vim', 'ft': 'vim'},
+    \             {'funcname': 'main', 'path': 'lua/float/window_relative.lua', 'ft': 'lua'},
+    \         ],
+    \         'desc': 'create a floating window relative to the current window',
     \     },
     \     'MathIsPrime': {
     \         'env': '(n)vim',
@@ -59,6 +82,21 @@ const s:DB = {
     \         'sources': [{'funcname': 'cookbook#math#transpose_table', 'path': 'autoload/cookbook/math.vim', 'ft': 'vim'}],
     \         'desc': 'convert a list of lists, forming a table, as the list of columns of the latter',
     \     },
+    \     'PopupBasic': {
+    \         'env': 'vim',
+    \         'sources': [{'funcname': 'cookbook#popup#basic#main', 'path': 'autoload/cookbook/popup/basic.vim', 'ft': 'vim'}],
+    \         'desc': 'create a basic popup',
+    \     },
+    \     'PopupWithBorder': {
+    \         'env': 'vim',
+    \         'sources': [{'funcname': 'cookbook#popup#with_border#main', 'path': 'autoload/cookbook/popup/with_border.vim', 'ft': 'vim'}],
+    \         'desc': 'create a popup with border',
+    \     },
+    \     'PopupTerminal': {
+    \         'env': 'vim',
+    \         'sources': [{'funcname': 'cookbook#popup#terminal#main', 'path': 'autoload/cookbook/popup/terminal.vim', 'ft': 'vim'}],
+    \         'desc': 'create a popup terminal',
+    \     },
     \     'RequireExampleLua': {
     \         'env': 'nvim',
     \         'sources': [
@@ -66,22 +104,6 @@ const s:DB = {
     \             {'funcname': 'compute', 'path': 'lua/substitute.lua', 'ft': 'lua'},
     \         ],
     \         'desc': 'invoke lua code from Vimscript',
-    \     },
-    \     'FloatWindowRelativeLua': {
-    \         'env': 'nvim',
-    \         'sources': [
-    \             {'funcname': 'cookbook#lua#float#window_relative#main', 'path': 'autoload/cookbook/lua/float/window_relative.vim', 'ft': 'vim'},
-    \             {'funcname': 'main', 'path': 'lua/float/window_relative.lua', 'ft': 'lua'},
-    \         ],
-    \         'desc': 'create a floating window relative to the current window',
-    \     },
-    \     'FloatBufferRelativeLua': {
-    \         'env': 'nvim',
-    \         'sources': [
-    \             {'funcname': 'cookbook#lua#float#buffer_relative#main', 'path': 'autoload/cookbook/lua/float/buffer_relative.vim', 'ft': 'vim'},
-    \             {'funcname': 'main', 'path': 'lua/float/buffer_relative.lua', 'ft': 'lua'},
-    \         ],
-    \         'desc': 'create a floating window relative to the current buffer',
     \     },
     \ },
     \ 'git': {
@@ -124,7 +146,7 @@ fu cookbook#main(args) abort "{{{2
     try
         call s:running_code_failed(funcname)
     catch
-        return lg#catch_error()
+        return lg#catch()
     endtry
 endfu
 
@@ -166,7 +188,11 @@ fu s:show_me_the_code(sources) abort "{{{2
         if i == 1 | let first_win_open = winnr() | endif
         if source.funcname !=# ''
             let func_pat = s:get_func_pat(source.funcname, source.ft)
-            exe '/'..func_pat
+            try
+                exe '/'..func_pat
+            catch /^Vim\%((\a\+)\)\=:E486:/
+                return lg#catch()
+            endtry
         endif
         norm! zMzv
     endfor
