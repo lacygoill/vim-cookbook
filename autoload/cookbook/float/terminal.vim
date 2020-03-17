@@ -46,11 +46,6 @@ fu s:float_create(what, opts) abort "{{{1
         \ 'relative': 'editor',
         \ 'style': 'minimal',
         \ })
-    " Nvim doesn't recognize the `highlight` key; remove it if it's present.{{{
-    "
-    " And  save its  value  in a  variable  so  that we  can  apply the  desired
-    " highlighting to the float once it will be opened.
-    "}}}
     let highlight = has_key(opts, 'highlight') ? remove(opts, 'highlight') : 'Normal'
     " open the float
     let winid = nvim_open_win(bufnr, v:true, opts)

@@ -30,14 +30,11 @@ fu cookbook#float#border#main() abort "{{{1
         \ })
 
     " create text float
-    let is_not_focused = !has_key(opts, 'enter') || opts.enter == v:false
     let lines = ['foo', 'bar', 'baz']
     let [text_bufnr, text_winid] = s:float_create(lines, opts)
-    " if the text float is not immediately focused, its contents is hidden by the border float;
+    " since the text float is not focused, its contents is hidden by the border float;
     " it needs to be focused at least temporarily
-    if is_not_focused
-        call s:focus_briefly(text_winid)
-    endif
+    call s:focus_briefly(text_winid)
 
     call s:wipe_border_when_closing(border_bufnr, text_bufnr)
 endfu
@@ -51,6 +48,11 @@ fu s:float_create(what, opts) abort "{{{1
         \ 'relative': 'editor',
         \ 'style': 'minimal',
         \ })
+    " Nvim doesn't recognize the `highlight` key.{{{
+    "
+    " Remove  it and  save its  value in  a variable  so that  we can  apply the
+    " desired highlighting to the float once it will be opened.
+    "}}}
     let highlight = remove(a:opts, 'highlight')
     let winid = nvim_open_win(bufnr, v:false, a:opts)
     call nvim_win_set_option(winid, 'winhl', 'NormalFloat:'..highlight)
