@@ -1,14 +1,23 @@
+const s:OPTS = {
+    \ 'row': 5,
+    \ 'col': 10,
+    \ 'width': 20,
+    \ 'height': 15,
+    \ 'highlight': 'Visual',
+    \ 'borderhighlight': 'WarningMsg',
+    \ }
+
 fu cookbook#float#border#main() abort "{{{1
     let opts = {
-        \ 'row': 5-1,
-        \ 'col': 10-1,
+        \ 'row': s:OPTS.row - 1,
+        \ 'col': s:OPTS.col - 1,
         "\ add 2 columns for the left/right borders, and 2 columsn for the left/right paddings
-        \ 'width': 20+4,
+        \ 'width': s:OPTS.width + 4,
         "\ add 2 lines for the top/bottom borders
-        \ 'height': 15+2,
+        \ 'height': s:OPTS.height + 2,
         \ 'anchor': 'NW',
         \ 'focusable': v:false,
-        \ 'highlight': 'WarningMsg',
+        \ 'highlight': s:OPTS.borderhighlight,
         \ }
 
     " create border float
@@ -26,15 +35,14 @@ fu cookbook#float#border#main() abort "{{{1
         \ 'col': opts.col + 2,
         \ 'width': opts.width - 4,
         \ 'height': opts.height - 2,
-        \ 'highlight': 'Visual',
+        \ 'highlight': s:OPTS.highlight,
         \ })
 
     " create text float
     let lines = ['foo', 'bar', 'baz']
     let [text_bufnr, text_winid] = s:float_create(lines, opts)
-    " since the text float is not focused, its contents is hidden by the border float;
-    " it needs to be focused at least temporarily
-    call s:focus_briefly(text_winid)
+    " since the text float is not focused, its contents is hidden by the border float
+    call s:redraw_text_float(text_winid)
 
     call s:wipe_border_when_closing(border_bufnr, text_bufnr)
 endfu
@@ -59,14 +67,12 @@ fu s:float_create(what, opts) abort "{{{1
     return [bufnr, winid]
 endfu
 
-fu s:focus_briefly(text_winid) abort "{{{1
+fu s:redraw_text_float(text_winid) abort "{{{1
     let curwin = win_getid()
-    " focus the text float
-    call win_gotoid(a:text_winid)
+    " redraw the screen while the text float is focused
+    call win_gotoid(a:text_winid) | redraw
     " get back to the original window
-    call timer_start(0, {-> win_gotoid(curwin)})
-    " for some reason, without a timer, the text float is still shadowed by the border float;
-    " it probably needs to stay focused at least a short time for Nvim to bother to draw it
+    call win_gotoid(curwin)
 endfu
 
 fu s:wipe_border_when_closing(border, text) abort "{{{1

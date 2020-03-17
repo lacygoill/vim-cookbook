@@ -3,7 +3,7 @@ const s:OPTS = {
     \ 'height': 0.6,
     \ 'xoffset': 0.5,
     \ 'yoffset': 0.5,
-    \ 'highlight': 'WarningMsg',
+    \ 'borderhighlight': 'WarningMsg',
     \ 'borderchars': ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
     \ }
 
@@ -14,7 +14,7 @@ fu cookbook#float#terminal#main() abort "{{{1
     " create border float
     let border = s:get_border(opts.width, opts.height)
     let _opts = extend(deepcopy(opts), {
-        \ 'highlight': s:OPTS.highlight,
+        \ 'highlight': s:OPTS.borderhighlight,
         \ 'focusable': v:false,
         \ })
     let border_bufnr = s:float_create(border, _opts)

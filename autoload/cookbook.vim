@@ -83,17 +83,17 @@ const s:DB = {
     \     },
     \     'MathIsPrime': {
     \         'env': '(n)vim',
-    \         'sources': [{'funcname': 'cookbook#math#is_prime', 'path': 'autoload/cookbook/math.vim', 'ft': 'vim'}],
+    \         'sources': [{'funcname': 'cookbook#math#is_prime#main', 'path': 'autoload/cookbook/math/is_prime.vim', 'ft': 'vim'}],
     \         'desc': 'test whether a number is prime',
     \     },
     \     'MathReadNumber': {
     \         'env': '(n)vim',
-    \         'sources': [{'funcname': 'cookbook#math#read_number', 'path': 'autoload/cookbook/math.vim', 'ft': 'vim'}],
+    \         'sources': [{'funcname': 'cookbook#math#read_number#main', 'path': 'autoload/cookbook/math/read_number.vim', 'ft': 'vim'}],
     \         'desc': 'read a numeric number in english words',
     \     },
     \     'MathTransposeTable': {
     \         'env': '(n)vim',
-    \         'sources': [{'funcname': 'cookbook#math#transpose_table', 'path': 'autoload/cookbook/math.vim', 'ft': 'vim'}],
+    \         'sources': [{'funcname': 'cookbook#math#transpose_table#main', 'path': 'autoload/cookbook/math/transpose_table.vim', 'ft': 'vim'}],
     \         'desc': 'convert a list of lists, forming a table, as the list of columns of the latter',
     \     },
     \     'PopupBasic': {
