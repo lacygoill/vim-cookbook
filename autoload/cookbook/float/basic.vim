@@ -5,6 +5,15 @@ fu cookbook#float#basic#main() abort
     "                           │        └ scratch buffer
     "                           └ don't list the buffer
     "}}}
+
+    " Make Nvim wipe the buffer automatically when it gets hidden.{{{
+    "
+    " Here, it's ok to wipe the buffer, because it's an ad-hoc one.
+    " But if it was  an existing one loaded from a file,  you would probably not
+    " want to wipe it.
+    "}}}
+    call nvim_buf_set_option(bufnr, 'bh', 'wipe')
+
     let lines = ['foo', 'bar', 'baz']
     " write the lines
     call nvim_buf_set_lines(bufnr, 0, -1, v:true, lines)
@@ -13,6 +22,8 @@ fu cookbook#float#basic#main() abort
     "                              │   └ up to the last line
     "                              └ from the first line in the buffer
     "}}}
+
+    " create the float
     let opts = {
         "\ `row` and `col` are 0-indexed in Nvim;
         "\ so, 4 and 9 describe the cell on the 5th line and 10th column;

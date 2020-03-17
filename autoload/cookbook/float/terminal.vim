@@ -17,7 +17,7 @@ fu cookbook#float#terminal#main() abort "{{{1
         \ 'highlight': s:OPTS.borderhighlight,
         \ 'focusable': v:false,
         \ })
-    let border_bufnr = s:float_create(border, _opts)
+    call s:float_create(border, _opts)
 
     " create terminal float
     call extend(opts, {
@@ -26,11 +26,9 @@ fu cookbook#float#terminal#main() abort "{{{1
         \ 'width': opts.width - 4,
         \ 'height': opts.height - 2,
         \ })
-    let term_bufnr = s:float_create([], opts)
+    call s:float_create([], opts)
     " `setl nomod` may suppress an error: https://github.com/neovim/neovim/issues/11962
     setl nomod | call termopen(&shell)
-
-    call s:wipe_border_when_closing(border_bufnr, term_bufnr)
 endfu
 
 fu s:float_create(what, opts) abort "{{{1
@@ -39,6 +37,7 @@ fu s:float_create(what, opts) abort "{{{1
     if what != []
         " write the border
         call nvim_buf_set_lines(bufnr, 0, -1, v:true, what)
+        call nvim_buf_set_option(bufnr, 'bh', 'wipe')
     endif
     call extend(opts, {
         \ 'row': opts.row - 1,
@@ -59,15 +58,6 @@ fu s:float_create(what, opts) abort "{{{1
     " `'focusable': v:false`.
     "}}}
     call nvim_win_set_option(winid, 'winhl', 'NormalFloat:'..highlight)
-    return bufnr
-endfu
-
-fu s:wipe_border_when_closing(border, term) abort "{{{1
-    augroup wipe_border
-        exe 'au! * <buffer='..a:term..'>'
-        exe 'au BufHidden,BufWipeout <buffer='..a:term..'> '
-            \ ..'exe "au! wipe_border * <buffer>" | bw! '..a:border
-    augroup END
 endfu
 
 fu s:get_geometry() abort "{{{1

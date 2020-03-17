@@ -27,7 +27,7 @@ fu cookbook#float#border#main() abort "{{{1
     " draw a border.
     "}}}
     let border = s:get_border(opts.width, opts.height)
-    let [border_bufnr, _] = s:float_create(border, opts)
+    call s:float_create(border, opts)
 
     " update the geometry of the text float so that its contents fits inside the border
     call extend(opts, {
@@ -40,15 +40,14 @@ fu cookbook#float#border#main() abort "{{{1
 
     " create text float
     let lines = ['foo', 'bar', 'baz']
-    let [text_bufnr, text_winid] = s:float_create(lines, opts)
+    let text_winid = s:float_create(lines, opts)
     " since the text float is not focused, its contents is hidden by the border float
     call s:redraw_text_float(text_winid)
-
-    call s:wipe_border_when_closing(border_bufnr, text_bufnr)
 endfu
 
 fu s:float_create(what, opts) abort "{{{1
     let bufnr = nvim_create_buf(v:false, v:true)
+    call nvim_buf_set_option(bufnr, 'bh', 'wipe')
     call nvim_buf_set_lines(bufnr, 0, -1, v:true, a:what)
     call extend(a:opts, {
         \ 'row': a:opts.row,
@@ -64,7 +63,7 @@ fu s:float_create(what, opts) abort "{{{1
     let highlight = remove(a:opts, 'highlight')
     let winid = nvim_open_win(bufnr, v:false, a:opts)
     call nvim_win_set_option(winid, 'winhl', 'NormalFloat:'..highlight)
-    return [bufnr, winid]
+    return winid
 endfu
 
 fu s:redraw_text_float(text_winid) abort "{{{1
@@ -73,14 +72,6 @@ fu s:redraw_text_float(text_winid) abort "{{{1
     call win_gotoid(a:text_winid) | redraw
     " get back to the original window
     call win_gotoid(curwin)
-endfu
-
-fu s:wipe_border_when_closing(border, text) abort "{{{1
-    augroup wipe_border
-        exe 'au! * <buffer='..a:text..'>'
-        exe 'au BufHidden,BufWipeout <buffer='..a:text..'> '
-            \ ..'exe "au! wipe_border * <buffer>" | bw! '..a:border
-    augroup END
 endfu
 
 fu s:get_border(width, height) abort "{{{1
