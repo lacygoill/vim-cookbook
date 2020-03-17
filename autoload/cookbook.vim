@@ -34,6 +34,20 @@ let g:autoloaded_cookbook = 1
 "}}}
 const s:DB = {
     \ 'vim': {
+    \     'FloatBasic': {
+    \         'env': 'nvim',
+    \         'sources': [
+    \             {'funcname': 'cookbook#float#basic#main', 'path': 'autoload/cookbook/float/basic.vim', 'ft': 'vim'},
+    \         ],
+    \         'desc': 'create a basic floating window',
+    \     },
+    \     'FloatBorder': {
+    \         'env': 'nvim',
+    \         'sources': [
+    \             {'funcname': 'cookbook#float#border#main', 'path': 'autoload/cookbook/float/border.vim', 'ft': 'vim'},
+    \         ],
+    \         'desc': 'create a floating window with a surrounding border',
+    \     },
     \     'FloatTerminal': {
     \         'env': 'nvim',
     \         'sources': [
@@ -87,9 +101,9 @@ const s:DB = {
     \         'sources': [{'funcname': 'cookbook#popup#basic#main', 'path': 'autoload/cookbook/popup/basic.vim', 'ft': 'vim'}],
     \         'desc': 'create a basic popup',
     \     },
-    \     'PopupWithBorder': {
+    \     'PopupBorder': {
     \         'env': 'vim',
-    \         'sources': [{'funcname': 'cookbook#popup#with_border#main', 'path': 'autoload/cookbook/popup/with_border.vim', 'ft': 'vim'}],
+    \         'sources': [{'funcname': 'cookbook#popup#border#main', 'path': 'autoload/cookbook/popup/border.vim', 'ft': 'vim'}],
     \         'desc': 'create a popup with border',
     \     },
     \     'PopupTerminal': {
