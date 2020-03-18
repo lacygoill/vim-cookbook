@@ -41,8 +41,10 @@ fu cookbook#float#border#main() abort "{{{1
     " create text float
     let lines = ['foo', 'bar', 'baz']
     let text_winid = s:float_create(lines, opts)
+
     " since the text float is not focused, its contents is hidden by the border float
     call s:redraw_text_float(text_winid)
+
     " when we close the text float, close the border float too
     call s:close_border_automatically(border_winid, text_winid)
 endfu
@@ -85,19 +87,7 @@ fu s:redraw_text_float(text_winid) abort "{{{1
     call win_gotoid(curwin)
 endfu
 
-fu s:close_border_automatically(border, text, ...) abort "{{{1
-    if !a:0
-        exe 'augroup close_border_'..a:border
-            au!
-            " when the text float is closed, close the border too
-            exe 'au WinClosed * call s:close_border_automatically('..a:border..', '..a:text..', 1)'
-        augroup END
-    else
-        if win_getid() == a:text
-            call nvim_win_close(a:border, 1)
-            exe 'au! close_border_'..a:border
-            exe 'aug! close_border_'..a:border
-        endif
-    endif
+fu s:close_border_automatically(border, text) abort "{{{1
+    exe 'au WinClosed '..a:text..' ++once call nvim_win_close('..a:border..', 1)'
 endfu
 

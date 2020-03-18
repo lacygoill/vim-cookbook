@@ -28,7 +28,14 @@ fu cookbook#float#terminal#main() abort "{{{1
         \ })
     let term_winid = s:float_create([], opts)
     " `setl nomod` may suppress an error: https://github.com/neovim/neovim/issues/11962
-    setl nomod | call termopen(&shell)
+    " `setl bh=hide` is necessary for the terminal to be togglable{{{
+    "
+    " Otherwise,  it  would  be  wiped  out when  you  toggle  it  off,  because
+    " `s:float_create()` has set `'bh'` to `wipe`.
+    " You  could  also  simply  clear  `bh`, but  the  issue  would  persist  if
+    " `'hidden'` is reset.
+    "}}}
+    setl nomod bh=hide | call termopen(&shell)
 
     call s:close_border_automatically(border_winid, term_winid)
 endfu
@@ -83,19 +90,7 @@ fu s:float_create(what, opts) abort "{{{1
     return winid
 endfu
 
-fu s:close_border_automatically(border, text, ...) abort "{{{1
-    if !a:0
-        exe 'augroup close_border_'..a:border
-            au!
-            " when the text float is closed, close the border too
-            exe 'au WinClosed * call s:close_border_automatically('..a:border..', '..a:text..', 1)'
-        augroup END
-    else
-        if win_getid() == a:text
-            call nvim_win_close(a:border, 1)
-            exe 'au! close_border_'..a:border
-            exe 'aug! close_border_'..a:border
-        endif
-    endif
+fu s:close_border_automatically(border, term) abort "{{{1
+    exe 'au WinClosed '..a:term..' ++once call nvim_win_close('..a:border..', 1)'
 endfu
 
