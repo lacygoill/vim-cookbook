@@ -11,21 +11,7 @@ fu cookbook#float#terminal#main() abort "{{{1
     let opts = {'anchor': 'NW'}
     let [opts.row, opts.col, opts.width, opts.height] = s:get_geometry()
 
-    " create border float
-    let border = s:get_border(opts.width, opts.height)
-    let _opts = extend(deepcopy(opts), {
-        \ 'highlight': s:OPTS.borderhighlight,
-        \ 'focusable': v:false,
-        \ })
-    let border_winid = s:float_create(border, _opts)
-
     " create terminal float
-    call extend(opts, {
-        \ 'row': opts.row + 1,
-        \ 'col': opts.col + 2,
-        \ 'width': opts.width - 4,
-        \ 'height': opts.height - 2,
-        \ })
     let term_winid = s:float_create([], opts)
     " `setl nomod` may suppress an error: https://github.com/neovim/neovim/issues/11962
     " `setl bh=hide` is necessary for the terminal to be togglable{{{
@@ -37,16 +23,29 @@ fu cookbook#float#terminal#main() abort "{{{1
     "}}}
     setl nomod bh=hide | call termopen(&shell)
 
+    " create border float
+    call extend(opts, {
+        \ 'row': opts.row - 1,
+        \ 'col': opts.col - 2,
+        \ 'width': opts.width + 4,
+        \ 'height': opts.height + 2,
+        \ 'highlight': s:OPTS.borderhighlight,
+        \ 'focusable': v:false,
+        \ })
+    let border = s:get_border(opts.width, opts.height)
+    let border_winid = s:float_create(border, opts)
+
+    call win_gotoid(term_winid)
+
     call s:close_border_automatically(border_winid, term_winid)
 endfu
 
 fu s:get_geometry() abort "{{{1
-    let width = float2nr(&columns * s:OPTS.width)
-    let height = float2nr(&lines * s:OPTS.height)
+    let width = float2nr(&columns * s:OPTS.width) - 4
+    let height = float2nr(&lines * s:OPTS.height) - 2
 
-    " `+1` so that the geometry is identical as the popup terminal created by our Vim recipe.
-    let row = float2nr(s:OPTS.yoffset * (&lines - height)) + 1
-    let col = float2nr(s:OPTS.xoffset * (&columns - width)) + 1
+    let row = float2nr(s:OPTS.yoffset * (&lines - height))
+    let col = float2nr(s:OPTS.xoffset * (&columns - width))
 
     return [row, col, width, height]
 endfu
@@ -69,8 +68,8 @@ fu s:float_create(what, opts) abort "{{{1
         call nvim_buf_set_option(bufnr, 'bh', 'wipe')
     endif
     call extend(opts, {
-        \ 'row': opts.row - 1,
-        \ 'col': opts.col - 1,
+        \ 'row': opts.row,
+        \ 'col': opts.col,
         \ 'relative': 'editor',
         \ 'style': 'minimal',
         \ })

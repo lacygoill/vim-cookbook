@@ -44,7 +44,7 @@ fu s:get_geometry() abort "{{{1
     let height = float2nr(&lines * s:OPTS.height) - 2
 
     let row = float2nr(s:OPTS.yoffset * (&lines - height))
-    " `-1` so that the geometry is identical as the floating terminal created by our Nvim recipe.
+    " `-1` so that the position is identical as the floating terminal created by our Nvim recipe
     let col = float2nr(s:OPTS.xoffset * (&columns - width)) - 1
 
     return [row, col, width, height]
