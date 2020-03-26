@@ -14,7 +14,25 @@ fu cookbook#popup#terminal#main() abort "{{{1
     call extend(opts, #{
         \ maxwidth: opts.minwidth,
         \ maxheight: opts.minheight,
-        "\ in Terminal-Normal mode, don't highlight empty cells with `Pmenu` (same thing for padding cells)
+        "\ Make sure empty cells are highlighted just like non-empty cells in Terminal-Normal mode.{{{
+        "\ .
+        "\ When  you're in  Terminal-Job  mode, everything  is highlighted  according
+        "\ to  Vim's  internal   terminal  palette  (which  can   be  configured  via
+        "\ `g:terminal_ansi_colors`).
+        "\ .
+        "\ When you're in Terminal-Normal mode:
+        "\ .
+        "\    - the non-empty cells are still highlighted according to Vim's internal terminal palette
+        "\    - the empty cells are highlighted according the 'highlight' key, or `Pmenu` as a fallback
+        "\ .
+        "\ We want all cells to be highlighted in the exact same way; so we make sure
+        "\ that empty cells are highlighted just like the non-empty ones.
+        "\ .
+        "\ ---
+        "\ .
+        "\ The same issue applies to empty  cells in the padding areas, regardless of
+        "\ the mode you're in.
+        "\ }}}
         \ highlight: 'Normal',
         \ border: [],
         \ borderchars: s:OPTS.borderchars,
@@ -27,9 +45,22 @@ fu cookbook#popup#terminal#main() abort "{{{1
         \ })
 
     " create terminal buffer
-    let bufnr = term_start(&shell, #{hidden: v:true, term_kill: 'hup'})
-    " display it in popup window
-    call popup_create(bufnr, opts)
+    " `term_finish: 'close'` is useful if you close the terminal by pressing `C-d` or running `$ exit`.{{{
+    "
+    " This is  not necessary when you  toggle off your custom  popup terminal by
+    " pressing `C-g C-g`, but that's a special case.
+    "}}}
+    " `term_kill: 'hup'` may suppress `E947` when you try to quit Vim with `:q` or `:qa`.{{{
+    "
+    "     E947: Job still running in buffer "!/usr/local/bin/zsh"
+    "
+    " This is  only necessary for  a persistent terminal buffer  (e.g. togglable
+    " popup terminal) whose job may run until we quit Vim; like this one:
+    " https://gist.github.com/lacygoill/0bfef0a2e70ac7015aaee56a670c124b
+    "}}}
+    call term_start(&shell, #{hidden: v:true, term_finish: 'close', term_kill: 'hup'})
+        "\ display it in popup window
+        \->popup_create(opts)
 
     call s:fire_terminal_events()
 endfu
