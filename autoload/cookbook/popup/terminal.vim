@@ -62,6 +62,12 @@ fu cookbook#popup#terminal#main() abort "{{{1
         "\ display it in popup window
         \->popup_create(opts)
 
+    " Like for  all local options,  the local  value of `'termwinkey'`  has been
+    " reset to its default value (empty string), which makes Vim use `C-w`.
+    " Set the option  again, so that we  get the same experience  as in terminal
+    " buffers in non-popup windows.
+    let &l:termwinkey = &g:termwinkey
+
     call s:fire_terminal_events()
 endfu
 
