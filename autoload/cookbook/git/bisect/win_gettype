@@ -5,11 +5,11 @@
 #
 #     # run this command first! (it can change the commit you're currently on)
 #     $ git bisect reset
-#     $ git bisect start
-#     $ git checkout vA.B.C
-#     $ git bisect new
-#     $ git checkout vD.E.F
-#     $ git bisect old
+#     $ git bisect start vA.B.C vD.E.F
+#                         │      │
+#                         │      └ old commit
+#                         └ new commit
+#
 #     $ git bisect run /path/to/win_gettype
 #}}}
 
