@@ -224,8 +224,7 @@ fu s:populate_qfl_with_recipes(lang) abort "{{{2
     cw
     if &bt isnot# 'quickfix' | return | endif
     call s:conceal_noise()
-    augroup cookbook_conceal_noise
-        au!
+    augroup cookbook_conceal_noise | au!
         au BufWinEnter <buffer> call s:conceal_noise()
     augroup END
     nno <buffer><nowait><silent> <cr> :<c-u>call <sid>qf_run_recipe()<cr>
