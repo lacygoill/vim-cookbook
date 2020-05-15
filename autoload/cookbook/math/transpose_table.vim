@@ -24,7 +24,7 @@ fu s:transpose_table(...) abort
     " Check that all the arguments are lists and have the same size.
     let size = len(a:1)
     for list in a:000
-        if type(list) != type([]) || len(list) != size
+        if type(list) != v:t_list || len(list) != size
             return -1
         endif
     endfor

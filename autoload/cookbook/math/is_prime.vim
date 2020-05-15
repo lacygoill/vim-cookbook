@@ -11,7 +11,7 @@ endfu
 
 fu s:is_prime(n) abort
     let n = a:n
-    if type(n) != type(0) || n < 0
+    if type(n) != v:t_number || n < 0
         return -1
     endif
 
