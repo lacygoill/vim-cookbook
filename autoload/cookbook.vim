@@ -91,11 +91,6 @@ const s:DB = {
     \         'sources': [{'funcname': 'cookbook#math#read_number#main', 'path': 'autoload/cookbook/math/read_number.vim', 'ft': 'vim'}],
     \         'desc': 'read a numeric number in english words',
     \     },
-    \     'MathTransposeTable': {
-    \         'env': '(n)vim',
-    \         'sources': [{'funcname': 'cookbook#math#transpose_table#main', 'path': 'autoload/cookbook/math/transpose_table.vim', 'ft': 'vim'}],
-    \         'desc': 'convert a list of lists, forming a table, as the list of columns of the latter',
-    \     },
     \     'PopupBasic': {
     \         'env': 'vim',
     \         'sources': [{'funcname': 'cookbook#popup#basic#main', 'path': 'autoload/cookbook/popup/basic.vim', 'ft': 'vim'}],
