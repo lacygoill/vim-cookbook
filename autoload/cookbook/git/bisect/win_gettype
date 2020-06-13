@@ -10,6 +10,7 @@
 #                         │      └ old commit
 #                         └ new commit
 #
+#     # make sure the "win_gettype" script is executable
 #     $ git bisect run /path/to/win_gettype
 #}}}
 

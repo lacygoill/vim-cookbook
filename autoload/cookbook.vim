@@ -34,85 +34,33 @@ let g:autoloaded_cookbook = 1
 "}}}
 const s:DB = {
     \ 'vim': {
-    \     'FloatBasic': {
-    \         'env': 'nvim',
-    \         'sources': [
-    \             {'funcname': 'cookbook#float#basic#main', 'path': 'autoload/cookbook/float/basic.vim', 'ft': 'vim'},
-    \         ],
-    \         'desc': 'create a basic floating window',
-    \     },
-    \     'FloatBorder': {
-    \         'env': 'nvim',
-    \         'sources': [
-    \             {'funcname': 'cookbook#float#border#main', 'path': 'autoload/cookbook/float/border.vim', 'ft': 'vim'},
-    \         ],
-    \         'desc': 'create a floating window with a surrounding border',
-    \     },
-    \     'FloatTerminal': {
-    \         'env': 'nvim',
-    \         'sources': [
-    \             {'funcname': 'cookbook#float#terminal#main', 'path': 'autoload/cookbook/float/terminal.vim', 'ft': 'vim'},
-    \         ],
-    \         'desc': 'create a floating terminal',
-    \     },
     \     'FzfBasic': {
-    \         'env': '(n)vim',
     \         'sources': [{'funcname': 'cookbook#fzf#basic', 'path': 'autoload/cookbook/fzf.vim', 'ft': 'vim'}],
     \         'desc': 'filter some output via fzf',
     \     },
     \     'FzfWithColors': {
-    \         'env': '(n)vim',
     \         'sources': [{'funcname': 'cookbook#fzf#color', 'path': 'autoload/cookbook/fzf.vim', 'ft': 'vim'}],
     \         'desc': 'filter some output via fzf, coloring some part of it',
     \     },
-    \     'LuaFloatBufferRelative': {
-    \         'env': 'nvim',
-    \         'sources': [
-    \             {'funcname': 'cookbook#lua#float#buffer_relative#main', 'path': 'autoload/cookbook/lua/float/buffer_relative.vim', 'ft': 'vim'},
-    \             {'funcname': 'main', 'path': 'lua/float/buffer_relative.lua', 'ft': 'lua'},
-    \         ],
-    \         'desc': 'create a floating window relative to the current buffer',
-    \     },
-    \     'LuaFloatWindowRelative': {
-    \         'env': 'nvim',
-    \         'sources': [
-    \             {'funcname': 'cookbook#lua#float#window_relative#main', 'path': 'autoload/cookbook/lua/float/window_relative.vim', 'ft': 'vim'},
-    \             {'funcname': 'main', 'path': 'lua/float/window_relative.lua', 'ft': 'lua'},
-    \         ],
-    \         'desc': 'create a floating window relative to the current window',
-    \     },
     \     'MathIsPrime': {
-    \         'env': '(n)vim',
     \         'sources': [{'funcname': 'cookbook#math#is_prime#main', 'path': 'autoload/cookbook/math/is_prime.vim', 'ft': 'vim'}],
     \         'desc': 'test whether a number is prime',
     \     },
     \     'MathReadNumber': {
-    \         'env': '(n)vim',
     \         'sources': [{'funcname': 'cookbook#math#read_number#main', 'path': 'autoload/cookbook/math/read_number.vim', 'ft': 'vim'}],
     \         'desc': 'read a numeric number in english words',
     \     },
     \     'PopupBasic': {
-    \         'env': 'vim',
     \         'sources': [{'funcname': 'cookbook#popup#basic#main', 'path': 'autoload/cookbook/popup/basic.vim', 'ft': 'vim'}],
     \         'desc': 'create a basic popup',
     \     },
     \     'PopupBorder': {
-    \         'env': 'vim',
     \         'sources': [{'funcname': 'cookbook#popup#border#main', 'path': 'autoload/cookbook/popup/border.vim', 'ft': 'vim'}],
     \         'desc': 'create a popup with border',
     \     },
     \     'PopupTerminal': {
-    \         'env': 'vim',
     \         'sources': [{'funcname': 'cookbook#popup#terminal#main', 'path': 'autoload/cookbook/popup/terminal.vim', 'ft': 'vim'}],
     \         'desc': 'create a popup terminal',
-    \     },
-    \     'RequireExampleLua': {
-    \         'env': 'nvim',
-    \         'sources': [
-    \             {'funcname': 'cookbook#lua#substitute', 'path': 'autoload/cookbook/lua.vim', 'ft': 'vim'},
-    \             {'funcname': 'compute', 'path': 'lua/substitute.lua', 'ft': 'lua'},
-    \         ],
-    \         'desc': 'invoke lua code from Vimscript',
     \     },
     \ },
     \ 'git': {
@@ -280,12 +228,6 @@ endfu
 fu s:is_invalid(recipe, lang) abort "{{{2
     if !(has_key(s:DB, a:lang) && has_key(s:DB[a:lang], a:recipe))
         return cookbook#error(a:recipe..' is not a known recipe')
-    elseif a:lang is# 'vim'
-        if s:DB.vim[a:recipe].env is# 'vim' && has('nvim')
-            return cookbook#error('this recipe only works in Vim')
-        elseif s:DB.vim[a:recipe].env is# 'nvim' && !has('nvim')
-            return cookbook#error('this recipe only works in Neovim')
-        endif
     endif
     return 0
 endfu
@@ -313,8 +255,6 @@ endfu
 fu s:get_func_pat(funcname, ft) abort "{{{2
     let kwd = get({
         \ 'vim': 'fu\%[nction]!\=',
-        \ 'nvim': 'fu\%[nction]!\=',
-        \ '(n)vim': 'fu\%[nction]!\=',
         \ 'lua': 'local\s\+function',
         \ 'sh': '',
         \ }, a:ft, '')
