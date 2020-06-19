@@ -5,10 +5,8 @@
 #
 #     # run this command first! (it can change the commit you're currently on)
 #     $ git bisect reset
-#     $ git bisect start vA.B.C vD.E.F
-#                         │      │
-#                         │      └ old commit
-#                         └ new commit
+#
+#     $ git bisect start new_commit old_commit
 #
 #     # make sure the "win_gettype" script is executable
 #     $ git bisect run /path/to/win_gettype
@@ -30,4 +28,9 @@ make distclean
 # >   revision will be skipped.
 #}}}
 make || exit 125
+# You may need to pass a file argument to Vim:{{{
+#
+#     ./src/vim -Nu NONE -U NONE -i NONE -S /path/to/win_gettype.vim some_file
+#                                                                    ^^^^^^^^^
+#}}}
 ./src/vim -Nu NONE -U NONE -i NONE -S /path/to/win_gettype.vim
