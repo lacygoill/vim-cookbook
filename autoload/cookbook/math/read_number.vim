@@ -39,7 +39,7 @@ fu s:read_number(n) abort
         " Also, notice how there is no word between the two expressions:
         "
         "     s:TENS[n/10]..' '..s:read_number(n%10)
-        "                 ^^^^^^^
+        "                 ^-----^
         "                 no word
         "
         " Previously, there was always a word (e.g. "hundred", "thousand", ...).
