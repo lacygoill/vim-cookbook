@@ -6,7 +6,8 @@
 #     # run this command first! (it can change the commit you're currently on)
 #     $ git bisect reset
 #
-#     $ git bisect start new_commit old_commit
+#     $ git bisect start --term-old old --term-new new
+#     $ git bisect new <new_commit> && git bisect old <old_commit>
 #
 #     # make sure the "win_gettype" script is executable
 #     $ git bisect run /path/to/win_gettype

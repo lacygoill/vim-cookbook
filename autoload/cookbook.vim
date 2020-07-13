@@ -157,13 +157,14 @@ fu s:show_me_the_code(sources) abort "{{{2
 endfu
 
 fu s:populate_qfl_with_recipes(lang) abort "{{{2
-    let qfl = map(deepcopy(s:RECIPES[a:lang]), {_,v -> {
+    let items = map(deepcopy(s:RECIPES[a:lang]), {_,v -> {
         \ 'bufnr': bufadd(s:SROOTDIR..'/'..s:DB[a:lang][v].sources[0].path),
         \ 'module': v,
-        \ 'text': s:DB[a:lang][v].desc,
         \ 'pattern': s:DB[a:lang][v].sources[0].funcname,
+        \ 'text': s:DB[a:lang][v].desc,
         \ }})
-    call setqflist([], ' ', {'items': qfl, 'title': ':Cookbook -lang '..a:lang})
+    call setqflist([], ' ',
+        \ {'items': items, 'title': ':Cookbook -lang '..a:lang, 'quickfixtextfunc': function('s:disable_qftf')})
     cw
     if &bt isnot# 'quickfix' | return | endif
     call s:conceal_noise()
@@ -173,13 +174,22 @@ fu s:populate_qfl_with_recipes(lang) abort "{{{2
     nno <buffer><nowait><silent> <cr> :<c-u>call <sid>qf_run_recipe()<cr>
 endfu
 
+fu s:disable_qftf(info) abort
+    return []
+endfu
+
 fu s:conceal_noise() abort "{{{2
     setl cocu=nc cole=3
     call matchadd('Conceal', '^.\{-}\zs|.\{-}|\ze\s*', 0, -1, {'conceal': 'x'})
 endfu
 
 fu s:qf_run_recipe() abort "{{{2
-    let recipe = matchstr(getline('.'), '\S\+')
+    " The recipe name should not include two consecutive bars resulting from an empty middle field.{{{
+    "
+    " When pressing Enter on an entry, they  would cause the current line in the
+    " file we've jumped to be printed, which is distracting.
+    "}}}
+    let recipe = getline('.')->matchstr('[^ |]*')
     close
     let title = getqflist({'title': 0}).title
     let cmd = title..' '..recipe
