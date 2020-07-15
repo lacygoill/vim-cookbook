@@ -60,7 +60,7 @@ fu cookbook#popup#terminal#main() abort "{{{1
     "}}}
     call term_start(&shell, #{hidden: v:true, term_finish: 'close', term_kill: 'hup'})
         "\ display it in popup window
-        \->popup_create(opts)
+        \ ->popup_create(opts)
 
     " Like for  all local options,  the local  value of `'termwinkey'`  has been
     " reset to its default value (empty string), which makes Vim use `C-w`.

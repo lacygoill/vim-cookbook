@@ -164,7 +164,7 @@ fu s:populate_qfl_with_recipes(lang) abort "{{{2
         \ 'text': s:DB[a:lang][v].desc,
         \ }})
     call setqflist([], ' ',
-        \ {'items': items, 'title': ':Cookbook -lang '..a:lang, 'quickfixtextfunc': function('s:disable_qftf')})
+        \ {'items': items, 'title': ':Cookbook -lang '..a:lang})
     cw
     if &bt isnot# 'quickfix' | return | endif
     call s:conceal_noise()
@@ -172,10 +172,6 @@ fu s:populate_qfl_with_recipes(lang) abort "{{{2
         au BufWinEnter <buffer> call s:conceal_noise()
     augroup END
     nno <buffer><nowait><silent> <cr> :<c-u>call <sid>qf_run_recipe()<cr>
-endfu
-
-fu s:disable_qftf(info) abort
-    return []
 endfu
 
 fu s:conceal_noise() abort "{{{2
