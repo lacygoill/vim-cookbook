@@ -5,6 +5,12 @@ let g:autoloaded_cookbook = 1
 
 " Init {{{1
 
+fu s:SID() abort
+    return expand('<sfile>')->matchstr('<SNR>\zs\d\+\ze_SID$')->str2nr()
+endfu
+const s:SID = s:SID()->printf('<SNR>%d_')
+delfu s:SID
+
 " TODO: To find a recipe among many, consider including a 'tag' key in the database.{{{
 "
 " We could use it like so:
@@ -163,8 +169,11 @@ fu s:populate_qfl_with_recipes(lang) abort "{{{2
         \ 'pattern': s:DB[a:lang][v].sources[0].funcname,
         \ 'text': s:DB[a:lang][v].desc,
         \ }})
-    call setqflist([], ' ',
-        \ {'items': items, 'title': ':Cookbook -lang '..a:lang})
+    call setqflist([], ' ', {
+        \ 'items': items,
+        \ 'title': ':Cookbook -lang ' .. a:lang,
+        \ 'quickfixtextfunc': s:SID .. 'no_qftf'
+        \ })
     cw
     if &bt isnot# 'quickfix' | return | endif
     call s:conceal_noise()
@@ -172,6 +181,10 @@ fu s:populate_qfl_with_recipes(lang) abort "{{{2
         au BufWinEnter <buffer> call s:conceal_noise()
     augroup END
     nno <buffer><nowait><silent> <cr> :<c-u>call <sid>qf_run_recipe()<cr>
+endfu
+
+fu s:no_qftf(_) abort
+    return []
 endfu
 
 fu s:conceal_noise() abort "{{{2
