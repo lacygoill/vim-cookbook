@@ -29,8 +29,9 @@ let g:autoloaded_cookbook = 1
 "
 " ---
 "
-" Also, this allows us to get more meaningful recipes when tab completing `:Cookbook`,
-" or just when executing the command without arguments to populate the qfl.
+" Also,  this  lets   us  get  more  meaningful  recipes   when  tab  completing
+" `:Cookbook`, or just when executing  the command without arguments to populate
+" the qfl.
 "}}}
 const s:DB = {
     \ 'vim': {
