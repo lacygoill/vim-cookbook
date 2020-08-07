@@ -14,15 +14,15 @@ endfu
 
 fu s:read_number(n) abort
     let n = a:n
-    let [thousand, million, billion] = map(range(3), {_,v -> float2nr(pow(10, (v+1)*3))})
+    let [thousand, million, billion] = range(3)->map({_, v -> pow(10, (v + 1) * 3)->float2nr()})
     if n >= billion
-        return s:read_number(n/billion)..' billion '..s:read_number(n%billion)
+        return s:read_number(n/billion) .. ' billion ' .. s:read_number(n % billion)
     elseif n >= million
-        return s:read_number(n/million)..' million '..s:read_number(n%million)
+        return s:read_number(n/million) .. ' million ' .. s:read_number(n % million)
     elseif n >= thousand
-        return s:read_number(n/thousand)..' thousand '..s:read_number(n%thousand)
+        return s:read_number(n/thousand) .. ' thousand ' .. s:read_number(n % thousand)
     elseif n >= 100
-        return s:read_number(n/100)..' hundred '..s:read_number(n%100)
+        return s:read_number(n/100) .. ' hundred ' .. s:read_number(n % 100)
     " Why `20` and not `10`?{{{
     "
     " Because numbers between 11 and 19 get special names.
@@ -32,15 +32,15 @@ fu s:read_number(n) abort
     " See: https://english.stackexchange.com/q/7281/313834
         "}}}
     elseif n >= 20
-        let num = s:read_number(n%10)
+        let num = s:read_number(n % 10)
         " Why `s:TENS[n/10]` instead of `s:read_number(n/10)`?{{{
         "
         " Because you don't say "two ten three" for 23, but "twenty three".
         " Also, notice how there is no word between the two expressions:
         "
-        "     s:TENS[n/10]..' '..s:read_number(n%10)
-        "                 ^-----^
-        "                 no word
+        "     s:TENS[n/10] .. ' ' .. s:read_number(n % 10)
+        "                  ^-------^
+        "                   no word
         "
         " Previously, there was always a word (e.g. "hundred", "thousand", ...).
         " The difference in the code reflects this difference of word syntax.
@@ -52,7 +52,7 @@ fu s:read_number(n) abort
         "     twenty  thousand
         "           ^^
         "}}}
-        return s:TENS[n/10]..(num is# '' ? '' : ' '..num)
+        return s:TENS[n/10] .. (num == '' ? '' : ' ' .. num)
     else
         " Why the conditional operator?{{{
         "

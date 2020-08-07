@@ -37,7 +37,7 @@ fu cookbook#popup#terminal#main() abort "{{{1
         \ border: [],
         \ borderchars: s:OPTS.borderchars,
         \ borderhighlight: [s:OPTS.highlight],
-        \ padding: [0,1,0,1],
+        \ padding: [0, 1, 0, 1],
         "\ get the lowest `zindex` possible to be able to see the popup;
         "\ if it's too low, it may be hidden by an existing popup,
         "\ and if it's too high, it may hide future popups
@@ -89,7 +89,7 @@ endfu
 
 fu s:get_zindex() abort "{{{1
     " get screen position of the cursor
-    let screenpos = screenpos(win_getid(), line('.'), col('.'))
+    let screenpos = win_getid()->screenpos(line('.'), col('.'))
     " use it to get the id of the popup at the cursor, then the options of the latter
     let opts = popup_locate(screenpos.row, screenpos.col)->popup_getoptions()
     " return the `zindex` value of the popup at the cursor, plus one so that our

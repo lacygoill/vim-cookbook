@@ -5,6 +5,8 @@ let g:autoloaded_cookbook = 1
 
 " Init {{{1
 
+import Catch from 'lg.vim'
+
 " TODO: To find a recipe among many, consider including a 'tag' key in the database.{{{
 "
 " We could use it like so:
@@ -74,8 +76,8 @@ const s:DB = {
     \     },
     \ },
     \ }
-let s:_ = map(keys(s:DB), {_,v -> {v : keys(s:DB[v])}})
-let s:RECIPES = {} | call map(s:_, {_,v -> extend(s:RECIPES, v)}) | lockvar! s:RECIPES
+let s:_ = keys(s:DB)->map({_, v -> {v : keys(s:DB[v])}})
+let s:RECIPES = {} | call map(s:_, {_, v -> extend(s:RECIPES, v)}) | lockvar! s:RECIPES
 unlet s:_
 
 const s:SFILE = expand('<sfile>:p')
@@ -85,7 +87,7 @@ const s:SROOTDIR = expand('<sfile>:p:h:h')
 fu cookbook#main(args) abort "{{{2
     let lang = s:get_curlang(a:args)
     let recipe = s:get_recipe(a:args)
-    if recipe is# ''
+    if recipe == ''
         return s:populate_qfl_with_recipes(lang)
     elseif recipe is# '-check_db'
         return s:check_db()
@@ -104,14 +106,14 @@ fu cookbook#main(args) abort "{{{2
     try
         call s:running_code_failed(funcname)
     catch
-        return lg#catch()
+        return s:Catch()
     endtry
 endfu
 
 fu cookbook#complete(arglead, cmdline, pos) abort "{{{2
-    let word_before_cursor = matchstr(a:cmdline, '.*\s\zs-\S.*\%'..a:pos..'c.')
+    let word_before_cursor = matchstr(a:cmdline, '.*\s\zs-\S.*\%' .. a:pos .. 'c.')
     if word_before_cursor =~# '\C^-lang\s*\S*$'
-        return join(keys(s:DB), "\n")
+        return keys(s:DB)->join("\n")
     elseif a:arglead[0] is# '-'
         let options = ['-check_db', '-lang']
         return join(options, "\n")
@@ -137,29 +139,29 @@ endfu
 fu s:show_me_the_code(sources) abort "{{{2
     let i = 0 | for source in a:sources | let i += 1
         if s:is_already_displayed(source.path) | continue | endif
-        if i == 1 && bufname('%') is# '' && line2byte(line('$')+1) <= 2
+        if i == 1 && bufname('%') == '' && (line('$') + 1)->line2byte() <= 2
             let cmd = 'e'
         else
             let cmd = 'sp'
         endif
-        exe cmd..' '..source.path
+        exe cmd .. ' ' .. source.path
         if i == 1 | let first_win_open = winnr() | endif
-        if source.funcname !=# ''
+        if source.funcname != ''
             let func_pat = s:get_func_pat(source.funcname, source.ft)
             try
-                exe '/'..func_pat
+                exe '/' .. func_pat
             catch /^Vim\%((\a\+)\)\=:E486:/
-                return lg#catch()
+                return s:Catch()
             endtry
         endif
         norm! zMzv
     endfor
-    if exists('first_win_open') | exe first_win_open..'wincmd w' | endif
+    if exists('first_win_open') | exe first_win_open .. 'wincmd w' | endif
 endfu
 
 fu s:populate_qfl_with_recipes(lang) abort "{{{2
-    let items = map(deepcopy(s:RECIPES[a:lang]), {_,v -> {
-        \ 'bufnr': bufadd(s:SROOTDIR..'/'..s:DB[a:lang][v].sources[0].path),
+    let items = deepcopy(s:RECIPES[a:lang])->map({_, v -> {
+        \ 'bufnr': bufadd(s:SROOTDIR .. '/' .. s:DB[a:lang][v].sources[0].path),
         \ 'module': v,
         \ 'pattern': s:DB[a:lang][v].sources[0].funcname,
         \ 'text': s:DB[a:lang][v].desc,
@@ -192,7 +194,7 @@ fu s:qf_run_recipe() abort "{{{2
     let recipe = getline('.')->matchstr('[^ |]*')
     close
     let title = getqflist({'title': 0}).title
-    let cmd = title..' '..recipe
+    let cmd = title .. ' ' .. recipe
     exe cmd
 endfu
 
@@ -205,13 +207,13 @@ fu s:check_db() abort "{{{2
         for r in s:RECIPES[l]
             " iterate over source files of a given recipe
             for s in s:DB[l][r].sources
-                let file = s:SROOTDIR..'/'..s.path
+                let file = s:SROOTDIR .. '/' .. s.path
                 if !filereadable(file)
                     let report += [printf('    %s: "%s" is not readable', r, file)]
                 else
-                    if s.funcname is# '' | continue | endif
+                    if s.funcname == '' | continue | endif
                     let func_pat = s:get_func_pat(s.funcname, s.ft)
-                    if match(readfile(file), func_pat) == -1
+                    if readfile(file)->match(func_pat) == -1
                         let report += [printf('    %s: the function "%s" is not defined in "%s"', r, s.funcname, file)]
                     endif
                 endif
@@ -237,7 +239,7 @@ endfu
 
 fu s:is_invalid(recipe, lang) abort "{{{2
     if !(has_key(s:DB, a:lang) && has_key(s:DB[a:lang], a:recipe))
-        return cookbook#error(a:recipe..' is not a known recipe')
+        return cookbook#error(a:recipe .. ' is not a known recipe')
     endif
     return 0
 endfu
@@ -245,7 +247,7 @@ endfu
 fu s:get_curlang(args) abort "{{{2
     if a:args =~# '\C\%(^\|\s\)-lang\s'
         return matchstr(a:args, '-lang\s\+\zs\S\+')
-    elseif &ft isnot# '' && has_key(s:RECIPES, &ft)
+    elseif &ft != '' && has_key(s:RECIPES, &ft)
         return &ft
     else
         return 'vim'
@@ -258,8 +260,8 @@ endfu
 
 fu s:get_sources(recipe, lang) abort "{{{2
     let root = matchstr(s:SFILE, '^.\{-}\ze/autoload/')
-    return map(deepcopy(s:DB[a:lang][a:recipe].sources),
-        \ {_,v -> extend(v, {'path': root..'/'..v.path, 'ft': v.ft})})
+    return deepcopy(s:DB[a:lang][a:recipe].sources)
+        \ ->map({_, v -> extend(v, {'path': root .. '/' .. v.path, 'ft': v.ft})})
 endfu
 
 fu s:get_func_pat(funcname, ft) abort "{{{2
@@ -268,11 +270,11 @@ fu s:get_func_pat(funcname, ft) abort "{{{2
         \ 'lua': 'local\s\+function',
         \ 'sh': '',
         \ }, a:ft, '')
-    return '^\s*'..kwd..(kwd is# '' ? '\s*' : '\s\+')..a:funcname..'('
+    return '^\s*' .. kwd .. (kwd == '' ? '\s*' : '\s\+') .. a:funcname .. '('
 endfu
 
 fu s:is_already_displayed(file) abort "{{{2
-    let files_in_tab = map(tabpagebuflist(), {_,v -> fnamemodify(bufname(v), ':p')})
+    let files_in_tab = tabpagebuflist()->map({_, v -> bufname(v)->fnamemodify(':p')})
     return index(files_in_tab, a:file) != -1
 endfu
 

@@ -15,7 +15,7 @@ fu cookbook#popup#border#main() abort
         "\ `border` must be set to a list of boolean flags;
         "\ each flag is associated to a segment (top, right, bottom, left);
         "\ 0 = do *not* draw the segment, 1 = draw the segment;
-        "\ an empty list is equivalent to `[1,1,1,1]`
+        "\ an empty list is equivalent to `[1, 1, 1, 1]`
         \ border: [],
         "\ `borderchars` must be set to a list of characters;
         "\ the first 4 characters are associated to a segment (top, right, bottom, left),
@@ -23,7 +23,7 @@ fu cookbook#popup#border#main() abort
         \ borderchars: ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
         "\ it's aesthetically pleasing to have 2 padding columns on the left/right, but no padding lines above/below;
         "\ the padding is highlighted according to `highlight`, not `borderhighlight`
-        \ padding: [0,1,0,1],
+        \ padding: [0, 1, 0, 1],
         \ }
     call popup_create(what, opts)
 endfu

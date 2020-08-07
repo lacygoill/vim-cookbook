@@ -2,9 +2,9 @@ fu cookbook#math#is_prime#main() abort "{{{1
     " Purpose: test whether a number is prime
     let n = 1223
     if s:is_prime(n)
-        let msg = n..' is prime'
+        let msg = n .. ' is prime'
     else
-        let msg = n..' is not prime'
+        let msg = n .. ' is not prime'
     endif
     call cookbook#notify(msg)
 endfu
@@ -91,7 +91,7 @@ fu s:is_prime(n) abort
         "
         " How to code that?
         " Here's one way; the sum of 2 consecutive increments will always be
-        " 6 (2+4 or 4+2):
+        " 6 (2 + 4 or 4 + 2):
         "
         "     inc_current + inc_next = 6
         "
