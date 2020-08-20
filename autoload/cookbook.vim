@@ -6,6 +6,7 @@ let g:autoloaded_cookbook = 1
 " Init {{{1
 
 import Catch from 'lg.vim'
+import Popup_notification from 'lg/popup.vim'
 
 " TODO: To find a recipe among many, consider including a 'tag' key in the database.{{{
 "
@@ -111,8 +112,8 @@ fu cookbook#main(args) abort "{{{2
 endfu
 
 fu cookbook#complete(arglead, cmdline, pos) abort "{{{2
-    let word_before_cursor = matchstr(a:cmdline, '.*\s\zs-\S.*\%' .. a:pos .. 'c.')
-    if word_before_cursor =~# '\C^-lang\s*\S*$'
+    let from_dash_to_cursor = matchstr(a:cmdline, '.*\s\zs-.*\%' .. (a:pos + 1) .. 'c')
+    if from_dash_to_cursor =~# '\C^-lang\s*\S*$'
         return keys(s:DB)->join("\n")
     elseif a:arglead[0] is# '-'
         let options = ['-check_db', '-lang']
@@ -174,8 +175,18 @@ fu s:populate_qfl_with_recipes(lang) abort "{{{2
     cw
     if &bt isnot# 'quickfix' | return | endif
     call s:conceal_noise()
+    let s:qfid = get(s:, 'qfid', []) + [getqflist({'id': 0})]
     augroup cookbook_conceal_noise | au!
-        au BufWinEnter <buffer> call s:conceal_noise()
+        " Why do you inspect the qf id?  Isn't `<buffer>` enough?{{{
+        "
+        " Since 8.1.0877,  Vim re-uses the  *same* quickfix buffer every  time a
+        " quickfix window is opened.  Obviously,  the contents might be updated,
+        " but the number stays the same.
+        "
+        " We  need to  *also* inspect  the quickfix  id; otherwise,  the conceal
+        " could be re-applied to a new qf window displaying a different qfl.
+        "}}}
+        au BufWinEnter <buffer> if index(s:qfid, getqflist({'id': 0})) >= 0 | call s:conceal_noise() | endif
     augroup END
     nno <buffer><nowait><silent> <cr> :<c-u>call <sid>qf_run_recipe()<cr>
 endfu
@@ -280,9 +291,9 @@ endfu
 
 fu cookbook#notify(msg, ...) abort "{{{2
     try
-        call call('lg#popup#notification', [a:msg] + a:000)
+        call call('s:Popup_notification', [a:msg] + a:000)
     catch /^Vim\%((\a\+)\)\=:E117:/
-        call cookbook#error('need lg#popup#notification(); install vim-lg-lib')
+        call cookbook#error('need s:Popup_notification(); install vim-lg-lib')
     endtry
 endfu
 

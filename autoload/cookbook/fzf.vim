@@ -1,3 +1,5 @@
+import Popup_notification from 'lg/popup.vim'
+
 " Interface {{{1
 fu cookbook#fzf#basic() abort "{{{2
     " Purpose: filter a list of lines with fzf
@@ -27,9 +29,9 @@ endfu
 fu s:echo_choice(line) abort "{{{2
     let msg = 'you chose ' .. a:line
     try
-        call lg#popup#notification(msg)
+        call s:Popup_notification(msg)
     catch /^Vim\%((\a\+)\)\=:E117:/
-        call cookbook#error('need lg#popup#notification(); install vim-lg-lib')
+        call cookbook#error('need s:Popup_notification(); install vim-lg-lib')
     endtry
 endfu
 
