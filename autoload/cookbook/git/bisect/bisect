@@ -9,13 +9,13 @@
 #     $ git bisect start --term-old ok --term-new nope
 #     $ git bisect nope <new_commit> && git bisect ok <old_commit>
 #
-#     # make sure the "win_gettype" script is executable
-#     $ git bisect run /path/to/win_gettype
+#     # make sure the "bisect" script is executable
+#     $ git bisect run /tmp/bisect
 #}}}
 
 make clean
 make distclean
-./configure --with-features=huge
+./configure
 # Why `125`?{{{
 #
 # If the compilation  fails, we don't want `git-bisect(1)` to  interpret that as
@@ -31,7 +31,7 @@ make distclean
 make || exit 125
 # You may need to pass a file argument to Vim:{{{
 #
-#     ./src/vim -Nu NONE -U NONE -i NONE -S /path/to/win_gettype.vim some_file
-#                                                                    ^^^^^^^^^
+#     ./src/vim -Nu NONE -U NONE -i NONE -S /tmp/bisect.vim some_file
+#                                                           ^-------^
 #}}}
-./src/vim -Nu NONE -U NONE -i NONE -S /path/to/win_gettype.vim
+./src/vim -Nu NONE -U NONE -i NONE -S /tmp/bisect.vim
