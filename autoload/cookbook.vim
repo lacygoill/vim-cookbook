@@ -70,8 +70,8 @@ const s:DB = {
     \ 'git': {
     \     'BisectWithScript': {
     \         'sources': [
-    \             {'funcname': '', 'path': 'autoload/cookbook/git/bisect/win_gettype', 'ft': 'sh'},
-    \             {'funcname': '', 'path': 'autoload/cookbook/git/bisect/win_gettype.vim', 'ft': 'vim'},
+    \             {'funcname': '', 'path': 'autoload/cookbook/git/bisect/bisect', 'ft': 'sh'},
+    \             {'funcname': '', 'path': 'autoload/cookbook/git/bisect/bisect.vim', 'ft': 'vim'},
     \         ],
     \         'desc': 'bisect a commit automatically using a shell script',
     \     },
@@ -193,7 +193,7 @@ endfu
 
 fu s:conceal_noise() abort "{{{2
     setl cocu=nc cole=3
-    call matchadd('Conceal', '^.\{-}\zs|.\{-}|\ze\s*', 0, -1, {'conceal': 'x'})
+    call matchadd('Conceal', '^.\{-}\zs|.\{-}|\ze\s*', 0, -1, #{conceal: 'x'})
 endfu
 
 fu s:qf_run_recipe() abort "{{{2
