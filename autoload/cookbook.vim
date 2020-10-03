@@ -79,7 +79,7 @@ const s:DB = {
     \ }
 let s:_ = keys(s:DB)->map({_, v -> {v : keys(s:DB[v])}})
 let s:RECIPES = {} | call map(s:_, {_, v -> extend(s:RECIPES, v)}) | lockvar! s:RECIPES
-unlet s:_
+unlet! s:_
 
 const s:SFILE = expand('<sfile>:p')
 const s:SROOTDIR = expand('<sfile>:p:h:h')
