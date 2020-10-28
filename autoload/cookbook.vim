@@ -54,6 +54,10 @@ const s:DB = {
     \         'sources': [{'funcname': 'cookbook#math#read_number#main', 'path': 'autoload/cookbook/math/read_number.vim', 'ft': 'vim'}],
     \         'desc': 'read a numeric number in english words',
     \     },
+    \     'Permutations': {
+    \         'sources': [{'funcname': 'cookbook#permutations#main', 'path': 'autoload/cookbook/permutations.vim', 'ft': 'vim'}],
+    \         'desc': 'get all permutations of items in a list',
+    \     },
     \     'PopupBasic': {
     \         'sources': [{'funcname': 'cookbook#popup#basic#main', 'path': 'autoload/cookbook/popup/basic.vim', 'ft': 'vim'}],
     \         'desc': 'create a basic popup',
@@ -277,7 +281,7 @@ endfu
 
 fu s:get_func_pat(funcname, ft) abort "{{{2
     let kwd = get({
-        \ 'vim': 'fu\%[nction]!\=',
+        \ 'vim': 'fu\%[nction]!\=\|def!\=',
         \ 'lua': 'local\s\+function',
         \ 'sh': '',
         \ }, a:ft, '')

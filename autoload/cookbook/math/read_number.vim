@@ -9,7 +9,7 @@ fu cookbook#math#read_number#main() abort "{{{1
     "}}}
     let n = 1234
     let msg = printf("in english, %d can be read as\n%s", n, s:read_number(n))
-    call cookbook#notify(msg, {'time': 5000})
+    call cookbook#notify(msg, #{time: 5000})
 endfu
 
 fu s:read_number(n) abort
