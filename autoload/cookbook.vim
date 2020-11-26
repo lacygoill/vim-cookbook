@@ -192,7 +192,7 @@ fu s:populate_qfl_with_recipes(lang) abort "{{{2
         "}}}
         au BufWinEnter <buffer> if index(s:qfid, getqflist({'id': 0})) >= 0 | call s:conceal_noise() | endif
     augroup END
-    nno <buffer><nowait><silent> <cr> :<c-u>call <sid>qf_run_recipe()<cr>
+    nno <buffer><nowait> <cr> <cmd>call <sid>qf_run_recipe()<cr>
 endfu
 
 fu s:conceal_noise() abort "{{{2

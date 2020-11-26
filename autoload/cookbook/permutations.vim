@@ -6,7 +6,7 @@ def cookbook#permutations#main() #{{{2
     var permutations = Permutations(l)
         ->map({_, v -> join(v)})->join("\n")
     var msg = printf("the permutations of %s are:\n\n%s", l, permutations)
-    call cookbook#notify(msg, #{time: 5000})
+    cookbook#notify(msg, {time: 5000})
 enddef
 #}}}1
 # Core {{{1
