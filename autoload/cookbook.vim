@@ -165,16 +165,16 @@ fu s:show_me_the_code(sources) abort "{{{2
 endfu
 
 fu s:populate_qfl_with_recipes(lang) abort "{{{2
-    let items = deepcopy(s:RECIPES[a:lang])->map({_, v -> {
-        \ 'bufnr': bufadd(s:SROOTDIR .. '/' .. s:DB[a:lang][v].sources[0].path),
-        \ 'module': v,
-        \ 'pattern': s:DB[a:lang][v].sources[0].funcname,
-        \ 'text': s:DB[a:lang][v].desc,
+    let items = mapnew(s:RECIPES[a:lang], {_, v -> #{
+        \ bufnr: bufadd(s:SROOTDIR .. '/' .. s:DB[a:lang][v].sources[0].path),
+        \ module: v,
+        \ pattern: s:DB[a:lang][v].sources[0].funcname,
+        \ text: s:DB[a:lang][v].desc,
         \ }})
-    call setqflist([], ' ', {
-        \ 'items': items,
-        \ 'title': ':Cookbook -lang ' .. a:lang,
-        \ 'quickfixtextfunc': {-> []},
+    call setqflist([], ' ', #{
+        \ items: items,
+        \ title: ':Cookbook -lang ' .. a:lang,
+        \ quickfixtextfunc: {-> []},
         \ })
     cw
     if &bt isnot# 'quickfix' | return | endif
@@ -275,8 +275,8 @@ endfu
 
 fu s:get_sources(recipe, lang) abort "{{{2
     let root = matchstr(s:SFILE, '^.\{-}\ze/autoload/')
-    return deepcopy(s:DB[a:lang][a:recipe].sources)
-        \ ->map({_, v -> extend(v, {'path': root .. '/' .. v.path, 'ft': v.ft})})
+    return mapnew(s:DB[a:lang][a:recipe].sources,
+        \ {_, v -> extend(v, {'path': root .. '/' .. v.path, 'ft': v.ft})})
 endfu
 
 fu s:get_func_pat(funcname, ft) abort "{{{2
