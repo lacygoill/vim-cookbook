@@ -149,11 +149,7 @@ fu s:show_me_the_code(sources) abort "{{{2
         else
             let cmd = 'sp'
         endif
-        let filename = source.path->globpath(&rtp, v:false, v:true)->get(0)
-        if filename->empty()
-            return
-        endif
-        exe cmd .. ' ' .. filename
+        exe cmd .. ' ' .. source.path
         if i == 1 | let first_win_open = winnr() | endif
         if source.funcname != ''
             let func_pat = s:get_func_pat(source.funcname, source.ft)
@@ -280,7 +276,7 @@ endfu
 fu s:get_sources(recipe, lang) abort "{{{2
     let root = matchstr(s:SFILE, '^.\{-}\ze/autoload/')
     return deepcopy(s:DB[a:lang][a:recipe].sources)
-        ->map({_, v -> extend(v, {'path': root .. '/' .. v.path, 'ft': v.ft})})
+        \ ->map({_, v -> extend(v, {'path': root .. '/' .. v.path, 'ft': v.ft})})
 endfu
 
 fu s:get_func_pat(funcname, ft) abort "{{{2
