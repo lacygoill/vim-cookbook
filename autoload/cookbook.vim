@@ -180,7 +180,7 @@ fu s:populate_qfl_with_recipes(lang) abort "{{{2
     if &bt isnot# 'quickfix' | return | endif
     call s:conceal_noise()
     let s:qfid = get(s:, 'qfid', []) + [getqflist({'id': 0})]
-    augroup cookbook_conceal_noise | au!
+    augroup CookbookConcealNoise | au!
         " Why do you inspect the qf id?  Isn't `<buffer>` enough?{{{
         "
         " Since 8.1.0877,  Vim re-uses the  *same* quickfix buffer every  time a
