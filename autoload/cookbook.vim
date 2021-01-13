@@ -1,235 +1,306 @@
-if exists('g:autoloaded_cookbook')
-    finish
-endif
-let g:autoloaded_cookbook = 1
+vim9 noclear
 
-" Init {{{1
+if exists('loaded') | finish | endif
+var loaded = true
+
+# Init {{{1
 
 import Catch from 'lg.vim'
 import Popup_notification from 'lg/popup.vim'
 
-" TODO: To find a recipe among many, consider including a 'tag' key in the database.{{{
-"
-" We could use it like so:
-"
-"     :CookBook -tag 'foo and bar'
-"
-" This would display all recipes containing the tags 'foo' and 'bar'.
-" In addition to `and`, we could use the operators `or` and `not` (just like `tmsu(1)`).
-"}}}
+# TODO: To find a recipe among many, consider including a 'tag' key in the database.{{{
+#
+# We could use it like so:
+#
+#     :CookBook -tag 'foo and bar'
+#
+# This would display all recipes containing the tags 'foo' and 'bar'.
+# In addition to `and`, we could use the operators `or` and `not` (just like `tmsu(1)`).
+#}}}
 
-" Why do you put a filetype name at the root of the database?{{{
-"
-" It's not a filetype; it's the name of a language.
-"
-" This should allow us to use the same name for a recipe written in different languages.
-" For example, you could write an `IsPrime` recipe in `vim`, `python` and `lua`.
-" Without the name of a language at the root of the db, there would be a conflict.
-"
-" Note that  a single  recipe may  be implemented via  several files  written in
-" different  languages.  When  you add  a recipe  to the  db, put  it under  the
-" language in which its interface is written.
-"
-" ---
-"
-" Also,  this  lets   us  get  more  meaningful  recipes   when  tab  completing
-" `:Cookbook`, or just when executing  the command without arguments to populate
-" the qfl.
-"}}}
-const s:DB = {
-    \ 'vim': {
-    \     'FzfBasic': {
-    \         'sources': [{'funcname': 'cookbook#fzf#basic', 'path': 'autoload/cookbook/fzf.vim', 'ft': 'vim'}],
-    \         'desc': 'filter some output via fzf',
-    \     },
-    \     'FzfWithColors': {
-    \         'sources': [{'funcname': 'cookbook#fzf#color', 'path': 'autoload/cookbook/fzf.vim', 'ft': 'vim'}],
-    \         'desc': 'filter some output via fzf, coloring some part of it',
-    \     },
-    \     'MathIsPrime': {
-    \         'sources': [{'funcname': 'cookbook#math#is_prime#main', 'path': 'autoload/cookbook/math/is_prime.vim', 'ft': 'vim'}],
-    \         'desc': 'test whether a number is prime',
-    \     },
-    \     'MathReadNumber': {
-    \         'sources': [{'funcname': 'cookbook#math#read_number#main', 'path': 'autoload/cookbook/math/read_number.vim', 'ft': 'vim'}],
-    \         'desc': 'read a numeric number in english words',
-    \     },
-    \     'Permutations': {
-    \         'sources': [{'funcname': 'cookbook#permutations#main', 'path': 'autoload/cookbook/permutations.vim', 'ft': 'vim'}],
-    \         'desc': 'get all permutations of items in a list',
-    \     },
-    \     'PopupBasic': {
-    \         'sources': [{'funcname': 'cookbook#popup#basic#main', 'path': 'autoload/cookbook/popup/basic.vim', 'ft': 'vim'}],
-    \         'desc': 'create a basic popup',
-    \     },
-    \     'PopupBorder': {
-    \         'sources': [{'funcname': 'cookbook#popup#border#main', 'path': 'autoload/cookbook/popup/border.vim', 'ft': 'vim'}],
-    \         'desc': 'create a popup with border',
-    \     },
-    \     'PopupTerminal': {
-    \         'sources': [{'funcname': 'cookbook#popup#terminal#main', 'path': 'autoload/cookbook/popup/terminal.vim', 'ft': 'vim'}],
-    \         'desc': 'create a popup terminal',
-    \     },
-    \ },
-    \ 'git': {
-    \     'BisectWithScript': {
-    \         'sources': [
-    \             {'funcname': '', 'path': 'autoload/cookbook/git/bisect/bisect', 'ft': 'sh'},
-    \             {'funcname': '', 'path': 'autoload/cookbook/git/bisect/bisect.vim', 'ft': 'vim'},
-    \         ],
-    \         'desc': 'bisect a commit automatically using a shell script',
-    \     },
-    \ },
-    \ }
-let s:_ = keys(s:DB)->map({_, v -> {v : keys(s:DB[v])}})
-let s:RECIPES = {} | call map(s:_, {_, v -> extend(s:RECIPES, v)}) | lockvar! s:RECIPES
-unlet! s:_
+# Why do you put a filetype name at the root of the database?{{{
+#
+# It's not a filetype; it's the name of a language.
+#
+# This should allow us to use the same name for a recipe written in different languages.
+# For example, you could write an `IsPrime` recipe in `vim`, `python` and `lua`.
+# Without the name of a language at the root of the db, there would be a conflict.
+#
+# Note that  a single  recipe may  be implemented via  several files  written in
+# different  languages.  When  you add  a recipe  to the  db, put  it under  the
+# language in which its interface is written.
+#
+# ---
+#
+# Also,  this  lets   us  get  more  meaningful  recipes   when  tab  completing
+# `:Cookbook`, or just when executing  the command without arguments to populate
+# the qfl.
+#}}}
+const DB = {
+    vim: {
+        FzfBasic: {
+            sources: [{
+                funcname: 'cookbook#fzf#basic',
+                path: 'autoload/cookbook/fzf.vim',
+                ft: 'vim'
+                }],
+            desc: 'filter some output via fzf',
+        },
+        FzfWithColors: {
+            sources: [{
+                funcname: 'cookbook#fzf#color',
+                path: 'autoload/cookbook/fzf.vim',
+                ft: 'vim'
+                }],
+            desc: 'filter some output via fzf, coloring some part of it',
+        },
+        MathIsPrime: {
+            sources: [{
+                funcname: 'cookbook#math#is_prime#main',
+                path: 'autoload/cookbook/math/is_prime.vim',
+                ft: 'vim'
+                }],
+            desc: 'test whether a number is prime',
+        },
+        MathReadNumber: {
+            sources: [{
+                funcname: 'cookbook#math#read_number#main',
+                path: 'autoload/cookbook/math/read_number.vim',
+                ft: 'vim'
+                }],
+            desc: 'read a numeric number in english words',
+        },
+        Permutations: {
+            sources: [{
+                funcname: 'cookbook#permutations#main',
+                path: 'autoload/cookbook/permutations.vim',
+                ft: 'vim'
+                }],
+            desc: 'get all permutations of items in a list',
+        },
+        PopupBasic: {
+            sources: [{
+                funcname: 'cookbook#popup#basic#main',
+                path: 'autoload/cookbook/popup/basic.vim',
+                ft: 'vim'
+                }],
+            desc: 'create a basic popup',
+        },
+        PopupBorder: {
+            sources: [{
+                funcname: 'cookbook#popup#border#main',
+                path: 'autoload/cookbook/popup/border.vim',
+                ft: 'vim'
+                }],
+            desc: 'create a popup with border',
+        },
+        PopupTerminal: {
+            sources: [{
+                funcname: 'cookbook#popup#terminal#main',
+                path: 'autoload/cookbook/popup/terminal.vim',
+                ft: 'vim'
+                }],
+            desc: 'create a popup terminal',
+        },
+    },
+    git: {
+        BisectWithScript: {
+            sources: [{
+                funcname: '',
+                path: 'autoload/cookbook/git/bisect/bisect',
+                ft: 'sh'
+                }, {
+                funcname: '',
+                path: 'autoload/cookbook/git/bisect/bisect.vim',
+                ft: 'vim'
+                }],
+            desc: 'bisect a commit automatically using a shell script',
+        },
+    },
+    }
 
-const s:SFILE = expand('<sfile>:p')
-const s:SROOTDIR = expand('<sfile>:p:h:h')
+var recipes_per_lang = keys(DB)->mapnew((_, v) => ({[v]: keys(DB[v])}))
+var RECIPES = {}
+map(recipes_per_lang, (_, v) => extend(RECIPES, v))
+lockvar! RECIPES
 
-" Interface {{{1
-fu cookbook#main(args) abort "{{{2
-    let lang = s:get_curlang(a:args)
-    let recipe = s:get_recipe(a:args)
+const SFILE = expand('<sfile>:p')
+const SROOTDIR = expand('<sfile>:p:h:h')
+
+# Interface {{{1
+def cookbook#main(args: string) #{{{2
+    var lang = GetCurlang(args)
+    var recipe = GetRecipe(args)
     if recipe == ''
-        return s:populate_qfl_with_recipes(lang)
-    elseif recipe is# '-check_db'
-        return s:check_db()
+        PopulateQflWithRecipes(lang)
+        return
+    elseif recipe == '-check_db'
+        CheckDb()
+        return
     endif
-    if s:is_invalid(recipe, lang) | return | endif
-    let sources = s:get_sources(recipe, lang)
-    call s:show_me_the_code(sources)
-    " TODO: Support languages other than Vim.{{{
-    "
-    " If your recipe is written in awk, there won't be any Vim function to invoke.
-    " You'll probably just want to run  the script and see its result/output (in
-    " a popup terminal?).
-    "}}}
-    if lang isnot# 'vim' | return | endif
-    let funcname = s:DB[lang][recipe].sources[0].funcname
+    if IsInvalid(recipe, lang)
+        return
+    endif
+    var sources = GetSources(recipe, lang)
+    ShowMeTheCode(sources)
+    # TODO: Support languages other than Vim.{{{
+    #
+    # If your recipe is written in awk, there won't be any Vim function to invoke.
+    # You'll probably just want to run  the script and see its result/output (in
+    # a popup terminal?).
+    #}}}
+    if lang != 'vim'
+        return
+    endif
+    var funcname = DB[lang][recipe].sources[0].funcname
     try
-        call s:running_code_failed(funcname)
-    catch
-        return s:Catch()
+        call(funcname, [])
+    catch /^Vim\%((\a\+)\)\=:E119:/
+        Catch()
     endtry
-endfu
+enddef
 
-fu cookbook#complete(arglead, cmdline, pos) abort "{{{2
-    let from_dash_to_cursor = matchstr(a:cmdline, '.*\s\zs-.*\%' .. (a:pos + 1) .. 'c')
-    if from_dash_to_cursor =~# '\C^-lang\s*\S*$'
-        return keys(s:DB)->join("\n")
-    elseif a:arglead[0] is# '-'
-        let options = ['-check_db', '-lang']
+def cookbook#complete(arglead: string, cmdline: string, pos: number): string #{{{2
+    var from_dash_to_cursor = matchstr(cmdline, '.*\s\zs-.*\%' .. (pos + 1) .. 'c')
+    if from_dash_to_cursor =~ '\C^-lang\s*\S*$'
+        return keys(DB)->join("\n")
+    elseif arglead[0] == '-'
+        var options = ['-check_db', '-lang']
         return join(options, "\n")
     else
-        let curlang = s:get_curlang(a:cmdline)
-        let matches = get(s:RECIPES, curlang, [])
+        var curlang = GetCurlang(cmdline)
+        var matches = get(RECIPES, curlang, [])
         return join(matches, "\n")
     endif
-endfu
-"}}}1
-" Core {{{1
-fu s:running_code_failed(funcname) abort "{{{2
-    try
-        call call(a:funcname, [])
-    catch /^Vim\%((\a\+)\)\=:E119:/
-        echohl ErrorMsg
-        echom v:exception
-        echohl NONE
-        return 1
-    endtry
-endfu
+enddef
 
-fu s:show_me_the_code(sources) abort "{{{2
-    let i = 0 | for source in a:sources | let i += 1
-        if s:is_already_displayed(source.path) | continue | endif
+def cookbook#error(msg: string): bool #{{{2
+    redraw
+    echohl ErrorMsg
+    echo msg
+    echohl NONE
+    return true
+enddef
+
+def cookbook#notify(msg: string, opts: dict<number> = {}) #{{{2
+    try
+        call('Popup_notification', [msg, opts])
+    catch /^Vim\%((\a\+)\)\=:E117:/
+        cookbook#error('need Popup_notification(); install vim-lg-lib')
+    endtry
+enddef
+#}}}1
+# Core {{{1
+def ShowMeTheCode(sources: list<any>) #{{{2
+    var first_win_open: number
+    var i = 0 | for source in sources | i += 1
+        if IsAlreadyDisplayed(source.path)
+            continue
+        endif
+        var cmd: string
         if i == 1 && bufname('%') == '' && (line('$') + 1)->line2byte() <= 2
-            let cmd = 'e'
+            cmd = 'e'
         else
-            let cmd = 'sp'
+            cmd = 'sp'
         endif
         exe cmd .. ' ' .. source.path
-        if i == 1 | let first_win_open = winnr() | endif
+        if i == 1
+            first_win_open = winnr()
+        endif
         if source.funcname != ''
-            let func_pat = s:get_func_pat(source.funcname, source.ft)
+            var func_pat = GetFuncPat(source.funcname, source.ft)
             try
-                exe '/' .. func_pat
+                exe ':/' .. func_pat
             catch /^Vim\%((\a\+)\)\=:E486:/
-                return s:Catch()
+                Catch()
+                return
             endtry
         endif
         norm! zMzv
     endfor
-    if exists('first_win_open') | exe first_win_open .. 'wincmd w' | endif
-endfu
+    if first_win_open != 0
+        exe ':' .. first_win_open .. 'wincmd w'
+    endif
+enddef
 
-fu s:populate_qfl_with_recipes(lang) abort "{{{2
-    let items = mapnew(s:RECIPES[a:lang], {_, v -> #{
-        \ bufnr: bufadd(s:SROOTDIR .. '/' .. s:DB[a:lang][v].sources[0].path),
-        \ module: v,
-        \ pattern: s:DB[a:lang][v].sources[0].funcname,
-        \ text: s:DB[a:lang][v].desc,
-        \ }})
-    call setqflist([], ' ', #{
-        \ items: items,
-        \ title: ':Cookbook -lang ' .. a:lang,
-        \ quickfixtextfunc: {-> []},
-        \ })
+def PopulateQflWithRecipes(lang: string) #{{{2
+    var items = mapnew(RECIPES[lang], (_, v) => ({
+        bufnr: bufadd(SROOTDIR .. '/' .. DB[lang][v].sources[0].path),
+        module: v,
+        pattern: DB[lang][v].sources[0].funcname,
+        text: DB[lang][v].desc,
+        }))
+    setqflist([], ' ', {
+        items: items,
+        title: ':Cookbook -lang ' .. lang,
+        quickfixtextfunc: () => [],
+        })
     cw
-    if &bt isnot# 'quickfix' | return | endif
-    call s:conceal_noise()
-    let s:qfid = get(s:, 'qfid', []) + [getqflist({'id': 0})]
+    if &bt != 'quickfix'
+        return
+    endif
+    ConcealNoise()
+    qfid += [getqflist({id: 0})]
     augroup CookbookConcealNoise | au!
-        " Why do you inspect the qf id?  Isn't `<buffer>` enough?{{{
-        "
-        " Since 8.1.0877,  Vim re-uses the  *same* quickfix buffer every  time a
-        " quickfix window is opened.  Obviously,  the contents might be updated,
-        " but the number stays the same.
-        "
-        " We  need to  *also* inspect  the quickfix  id; otherwise,  the conceal
-        " could be re-applied to a new qf window displaying a different qfl.
-        "}}}
-        au BufWinEnter <buffer> if index(s:qfid, getqflist({'id': 0})) >= 0 | call s:conceal_noise() | endif
+        # Why do you inspect the qf id?  Isn't `<buffer>` enough?{{{
+        #
+        # Since 8.1.0877,  Vim re-uses the  *same* quickfix buffer every  time a
+        # quickfix window is opened.  Obviously,  the contents might be updated,
+        # but the number stays the same.
+        #
+        # We  need to  *also* inspect  the quickfix  id; otherwise,  the conceal
+        # could be re-applied to a new qf window displaying a different qfl.
+        #}}}
+        au BufWinEnter <buffer> if index(qfid, getqflist({id: 0})) >= 0
+            |     ConcealNoise()
+            |     InstallMapping()
+            | endif
     augroup END
-    nno <buffer><nowait> <cr> <cmd>call <sid>qf_run_recipe()<cr>
-endfu
+    nno <buffer><nowait> <cr> <cmd>call <sid>QfRunRecipe()<cr>
+enddef
+var qfid: list<dict<number>>
 
-fu s:conceal_noise() abort "{{{2
+def ConcealNoise() #{{{2
     setl cocu=nc cole=3
-    call matchadd('Conceal', '^.\{-}\zs|.\{-}|\ze\s*', 0, -1, #{conceal: 'x'})
-endfu
+    matchadd('Conceal', '^.\{-}\zs|.\{-}|\ze\s*', 0, -1, {conceal: 'x'})
+enddef
 
-fu s:qf_run_recipe() abort "{{{2
-    " The recipe name should not include two consecutive bars resulting from an empty middle field.{{{
-    "
-    " When pressing Enter on an entry, they  would cause the current line in the
-    " file we've jumped to be printed, which is distracting.
-    "}}}
-    let recipe = getline('.')->matchstr('[^ |]*')
+def InstallMapping() #{{{2
+    nno <buffer><nowait> <cr> <cmd>call <sid>QfRunRecipe()<cr>
+enddef
+
+def QfRunRecipe() #{{{2
+    # The recipe name should not include two consecutive bars resulting from an empty middle field.{{{
+    #
+    # When pressing Enter on an entry, they  would cause the current line in the
+    # file we've jumped to be printed, which is distracting.
+    #}}}
+    var recipe = getline('.')->matchstr('[^ |]*')
     close
-    let title = getqflist({'title': 0}).title
-    let cmd = title .. ' ' .. recipe
+    var title = getqflist({title: 0}).title
+    var cmd = title .. ' ' .. recipe
     exe cmd
-endfu
+enddef
 
-fu s:check_db() abort "{{{2
-    let report = []
-    " iterate over languages
-    for l in keys(s:RECIPES)
-        let report += [l]
-        " iterate over recipes in a given language
-        for r in s:RECIPES[l]
-            " iterate over source files of a given recipe
-            for s in s:DB[l][r].sources
-                let file = s:SROOTDIR .. '/' .. s.path
+def CheckDb() #{{{2
+    var report = []
+    # iterate over languages
+    for l in keys(RECIPES)
+        report += [l]
+        # iterate over recipes in a given language
+        for r in RECIPES[l]
+            # iterate over source files of a given recipe
+            for s in DB[l][r].sources
+                var file = SROOTDIR .. '/' .. s.path
                 if !filereadable(file)
-                    let report += [printf('    %s: "%s" is not readable', r, file)]
+                    report += [printf('    %s: "%s" is not readable', r, file)]
                 else
-                    if s.funcname == '' | continue | endif
-                    let func_pat = s:get_func_pat(s.funcname, s.ft)
+                    if s.funcname == ''
+                        continue
+                    endif
+                    var func_pat = GetFuncPat(s.funcname, s.ft)
                     if readfile(file)->match(func_pat) == -1
-                        let report += [printf('    %s: the function "%s" is not defined in "%s"', r, s.funcname, file)]
+                        report += [printf('    %s: the function "%s" is not defined in "%s"', r, s.funcname, file)]
                     endif
                 endif
             endfor
@@ -240,64 +311,49 @@ fu s:check_db() abort "{{{2
         return
     endif
     new
-    call setline(1, report)
-endfu
-"}}}1
-" Util {{{1
-fu cookbook#error(msg) abort "{{{2
-    redraw
-    echohl ErrorMsg
-    echo a:msg
-    echohl NONE
-    return 1
-endfu
-
-fu s:is_invalid(recipe, lang) abort "{{{2
-    if !(has_key(s:DB, a:lang) && has_key(s:DB[a:lang], a:recipe))
-        return cookbook#error(a:recipe .. ' is not a known recipe')
+    setline(1, report)
+enddef
+#}}}1
+# Util {{{1
+def IsInvalid(recipe: string, lang: string): bool #{{{2
+    if !(has_key(DB, lang) && has_key(DB[lang], recipe))
+        return cookbook#error(recipe .. ' is not a known recipe')
     endif
-    return 0
-endfu
+    return false
+enddef
 
-fu s:get_curlang(args) abort "{{{2
-    if a:args =~# '\C\%(^\|\s\)-lang\s'
-        return matchstr(a:args, '-lang\s\+\zs\S\+')
-    elseif &ft != '' && has_key(s:RECIPES, &ft)
+def GetCurlang(args: string): string #{{{2
+    if args =~ '\C\%(^\|\s\)-lang\s'
+        return matchstr(args, '-lang\s\+\zs\S\+')
+    elseif &ft != '' && has_key(RECIPES, &ft)
         return &ft
     else
         return 'vim'
     endif
-endfu
+enddef
 
-fu s:get_recipe(recipe) abort "{{{2
-    return substitute(a:recipe, '-lang\s\+\S\+\s*', '', '')
-endfu
+def GetRecipe(recipe: string): string #{{{2
+    return substitute(recipe, '-lang\s\+\S\+\s*', '', '')
+enddef
 
-fu s:get_sources(recipe, lang) abort "{{{2
-    let root = matchstr(s:SFILE, '^.\{-}\ze/autoload/')
-    return deepcopy(s:DB[a:lang][a:recipe].sources)
-        \ ->map({_, v -> extend(v, {'path': root .. '/' .. v.path, 'ft': v.ft})})
-endfu
+def GetSources(recipe: string, lang: string): list<dict<string>> #{{{2
+    var root = matchstr(SFILE, '^.\{-}\ze/autoload/')
+    return deepcopy(DB[lang][recipe].sources)
+        ->map((_, v) => extend(v, {path: root .. '/' .. v.path, 'ft': v.ft}))
+enddef
 
-fu s:get_func_pat(funcname, ft) abort "{{{2
-    let kwd = get({
-        \ 'vim': 'fu\%[nction]!\=\|def!\=',
-        \ 'lua': 'local\s\+function',
-        \ 'sh': '',
-        \ }, a:ft, '')
-    return '^\s*' .. kwd .. (kwd == '' ? '\s*' : '\s\+') .. a:funcname .. '('
-endfu
+def GetFuncPat(funcname: string, ft: string): string #{{{2
+    var kwd = get({
+        vim: 'fu\%[nction]!\=\|def!\=',
+        lua: 'local\s\+function',
+        sh: '',
+        }, ft, '')
+    return '^\s*' .. kwd .. (kwd == '' ? '\s*' : '\s\+') .. funcname .. '('
+enddef
 
-fu s:is_already_displayed(file) abort "{{{2
-    let files_in_tab = tabpagebuflist()->map({_, v -> bufname(v)->fnamemodify(':p')})
-    return index(files_in_tab, a:file) != -1
-endfu
-
-fu cookbook#notify(msg, ...) abort "{{{2
-    try
-        call call('s:Popup_notification', [a:msg] + a:000)
-    catch /^Vim\%((\a\+)\)\=:E117:/
-        call cookbook#error('need s:Popup_notification(); install vim-lg-lib')
-    endtry
-endfu
+def IsAlreadyDisplayed(file: string): bool #{{{2
+    var files_in_tab = tabpagebuflist()
+        ->mapnew((_, v) => bufname(v)->fnamemodify(':p'))
+    return index(files_in_tab, file) != -1
+enddef
 

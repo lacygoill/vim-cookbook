@@ -1,37 +1,43 @@
+vim9 noclear
+
+if exists('loaded') | finish | endif
+var loaded = true
+
 import Popup_notification from 'lg/popup.vim'
 
-" Interface {{{1
-fu cookbook#fzf#basic() abort "{{{2
-    " Purpose: filter a list of lines with fzf
-    let source = ['foo', 'bar', 'baz', 'qux', 'norf']
-    call fzf#wrap({
-        \ 'source': source,
-        \ 'sink': function('s:echo_choice'),
-        \ })
-        \ ->fzf#run()
-endfu
+# color number in 256-color palette
+const MYCOLOR = 30
 
-fu cookbook#fzf#color() abort "{{{2
-    " Purpose: filter a list of lines with fzf; color some part of the lines
-    let source = ['1. one', '2. two', '3. three', '4. four', '5. five']
-    call map(source, {_, v -> substitute(v, '\d', "\x1b[38;5;30m&\x1b[0m", '')})
-    "                                                        ^^
-    "                                                        color number in 256-color palette
-    call fzf#wrap({
-        \ 'source': source,
-        \ 'options': '--ansi',
-        \ 'sink': function('s:echo_choice'),
-        \ })
-        \ ->fzf#run()
-endfu
-"}}}1
-" Util {{{1
-fu s:echo_choice(line) abort "{{{2
-    let msg = 'you chose ' .. a:line
+# Interface {{{1
+def cookbook#fzf#basic() #{{{2
+    # Purpose: filter a list of lines with fzf
+    var source = ['foo', 'bar', 'baz', 'qux', 'norf']
+    fzf#wrap({
+        source: source,
+        sink: EchoChoice,
+        })
+        ->fzf#run()
+enddef
+
+def cookbook#fzf#color() #{{{2
+    # Purpose: filter a list of lines with fzf; color some part of the lines
+    var source = ['1. one', '2. two', '3. three', '4. four', '5. five']
+    map(source, (_, v) => substitute(v, '\d', "\x1b[38;5;" .. MYCOLOR .. "m&\x1b[0m", ''))
+    fzf#wrap({
+        source: source,
+        options: '--ansi',
+        sink: EchoChoice,
+        })
+        ->fzf#run()
+enddef
+#}}}1
+# Util {{{1
+def EchoChoice(line: string) #{{{2
+    var msg = 'you chose ' .. line
     try
-        call s:Popup_notification(msg)
+        Popup_notification(msg)
     catch /^Vim\%((\a\+)\)\=:E117:/
-        call cookbook#error('need s:Popup_notification(); install vim-lg-lib')
+        call cookbook#error('need Popup_notification(); install vim-lg-lib')
     endtry
-endfu
+enddef
 

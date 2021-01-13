@@ -1,6 +1,6 @@
-if exists('g:loaded_cookbook')
-    finish
-endif
-let g:loaded_cookbook = 1
+vim9 noclear
 
-com -bar -nargs=* -complete=custom,cookbook#complete Cookbook call cookbook#main(<q-args>)
+if exists('loaded') | finish | endif
+var loaded = true
+
+com -bar -nargs=* -complete=custom,cookbook#complete Cookbook cookbook#main(<q-args>)
