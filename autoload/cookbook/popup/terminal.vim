@@ -3,7 +3,7 @@ vim9 noclear
 if exists('loaded') | finish | endif
 var loaded = true
 
-const OPTS = {
+const OPTS: dict<any> = {
     width: 0.9,
     height: 0.6,
     xoffset: 0.5,
@@ -82,21 +82,21 @@ def GetGeometry(): list<number> #{{{1
     # 2 lines are taken  by the top/bottom segments, and 4  columns are taken by
     # the right/left segments+paddings.
     #}}}
-    var width = float2nr(&columns * OPTS.width) - 4
-    var height = float2nr(&lines * OPTS.height) - 2
+    var width: number = float2nr(&columns * OPTS.width) - 4
+    var height: number = float2nr(&lines * OPTS.height) - 2
 
-    var row = float2nr(OPTS.yoffset * (&lines - height))
+    var row: number = float2nr(OPTS.yoffset * (&lines - height))
     # `-1` so that the position is identical as the floating terminal created by our old Nvim recipe
-    var col = float2nr(OPTS.xoffset * (&columns - width)) - 1
+    var col: number = float2nr(OPTS.xoffset * (&columns - width)) - 1
 
     return [row, col, width, height]
 enddef
 
 def GetZindex(): number #{{{1
     # get screen position of the cursor
-    var screenpos = win_getid()->screenpos(line('.'), col('.'))
+    var screenpos: dict<number> = win_getid()->screenpos(line('.'), col('.'))
     # use it to get the id of the popup at the cursor, then the options of the latter
-    var opts = popup_locate(screenpos.row, screenpos.col)->popup_getoptions()
+    var opts: dict<any> = popup_locate(screenpos.row, screenpos.col)->popup_getoptions()
     # return the `zindex` value of the popup at the cursor, plus one so that our
     # popup terminal barely wins
     return get(opts, 'zindex', 0) + 1

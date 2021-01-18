@@ -5,8 +5,8 @@ def cookbook#popup#basic#main()
     #    - a buffer number
     #    - a list of text lines with text properties
     #}}}
-    var what = ['foo', 'bar', 'baz']
-    var opts = {
+    var what: list<string> = ['foo', 'bar', 'baz']
+    var opts: dict<any> = {
         # position of the top-right corner (the tabline and the sign column are taken into account);
         # to check how the values are applied, enter tmux copy mode which lets you move the cursor anywhere
         line: 5,

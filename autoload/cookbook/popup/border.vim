@@ -1,6 +1,6 @@
 def cookbook#popup#border#main()
-    var what = ['foo', 'bar', 'baz']
-    var opts = {
+    var what: list<string> = ['foo', 'bar', 'baz']
+    var opts: dict<any> = {
         line: 5,
         col: 10,
         minwidth: 20,

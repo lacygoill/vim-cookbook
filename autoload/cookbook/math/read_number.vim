@@ -12,8 +12,8 @@ def cookbook#math#read_number#main() #{{{1
     #     :call cookbook#math#read_number(123)
     #     one hundred twenty three~
     #}}}
-    var n = 1234
-    var msg = printf("in english, %d can be read as\n%s", n, ReadNumber(n))
+    var n: number = 1234
+    var msg: string = printf("in english, %d can be read as\n%s", n, ReadNumber(n))
     cookbook#notify(msg, {time: 5000})
 enddef
 
@@ -40,7 +40,7 @@ def ReadNumber(n: number): string
     # See: https://english.stackexchange.com/q/7281/313834
         #}}}
     elseif n >= 20
-        var num = ReadNumber(n % 10)
+        var num: string = ReadNumber(n % 10)
         # Why `TENS[n / 10]` instead of `ReadNumber(n / 10)`?{{{
         #
         # Because you don't say "two ten three" for 23, but "twenty three".
@@ -71,7 +71,7 @@ def ReadNumber(n: number): string
     endif
 enddef
 
-const NUMS =<< trim END
+const NUMS: list<string> =<< trim END
     zero
     one
     two
@@ -94,7 +94,7 @@ const NUMS =<< trim END
     nineteen
 END
 
-const TENS =<< trim END
+const TENS: list<string> =<< trim END
     zero
     ten
     twenty

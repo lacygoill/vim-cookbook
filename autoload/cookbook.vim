@@ -36,7 +36,7 @@ import Popup_notification from 'lg/popup.vim'
 # `:Cookbook`, or just when executing  the command without arguments to populate
 # the qfl.
 #}}}
-const DB = {
+const DB: dict<dict<dict<any>>> = {
     vim: {
         FzfBasic: {
             sources: [{
@@ -119,18 +119,18 @@ const DB = {
     },
     }
 
-var recipes_per_lang = keys(DB)->mapnew((_, v) => ({[v]: keys(DB[v])}))
-var RECIPES = {}
+var recipes_per_lang: list<dict<list<string>>> = keys(DB)->mapnew((_, v) => ({[v]: keys(DB[v])}))
+var RECIPES: dict<list<string>> = {}
 map(recipes_per_lang, (_, v) => extend(RECIPES, v))
 lockvar! RECIPES
 
-const SFILE = expand('<sfile>:p')
-const SROOTDIR = expand('<sfile>:p:h:h')
+const SFILE: string = expand('<sfile>:p')
+const SROOTDIR: string = expand('<sfile>:p:h:h')
 
 # Interface {{{1
 def cookbook#main(args: string) #{{{2
-    var lang = GetCurlang(args)
-    var recipe = GetRecipe(args)
+    var lang: string = GetCurlang(args)
+    var recipe: string = GetRecipe(args)
     if recipe == ''
         PopulateQflWithRecipes(lang)
         return
@@ -141,7 +141,7 @@ def cookbook#main(args: string) #{{{2
     if IsInvalid(recipe, lang)
         return
     endif
-    var sources = GetSources(recipe, lang)
+    var sources: list<dict<string>> = GetSources(recipe, lang)
     ShowMeTheCode(sources)
     # TODO: Support languages other than Vim.{{{
     #
@@ -152,24 +152,26 @@ def cookbook#main(args: string) #{{{2
     if lang != 'vim'
         return
     endif
-    var funcname = DB[lang][recipe].sources[0].funcname
+    var funcname: string = DB[lang][recipe].sources[0].funcname
     try
         call(funcname, [])
     catch /^Vim\%((\a\+)\)\=:E119:/
         Catch()
+        return
     endtry
 enddef
 
 def cookbook#complete(arglead: string, cmdline: string, pos: number): string #{{{2
-    var from_dash_to_cursor = matchstr(cmdline, '.*\s\zs-.*\%' .. (pos + 1) .. 'c')
+    var from_dash_to_cursor: string = matchstr(cmdline,
+        '.*\s\zs-.*\%' .. (pos + 1) .. 'c')
     if from_dash_to_cursor =~ '\C^-lang\s*\S*$'
         return keys(DB)->join("\n")
     elseif arglead[0] == '-'
-        var options = ['-check_db', '-lang']
+        var options: list<string> = ['-check_db', '-lang']
         return join(options, "\n")
     else
-        var curlang = GetCurlang(cmdline)
-        var matches = get(RECIPES, curlang, [])
+        var curlang: string = GetCurlang(cmdline)
+        var matches: list<string> = get(RECIPES, curlang, [])
         return join(matches, "\n")
     endif
 enddef
@@ -193,7 +195,7 @@ enddef
 # Core {{{1
 def ShowMeTheCode(sources: list<any>) #{{{2
     var first_win_open: number
-    var i = 0 | for source in sources | i += 1
+    var i: number = 0 | for source in sources | i += 1
         if IsAlreadyDisplayed(source.path)
             continue
         endif
@@ -208,7 +210,7 @@ def ShowMeTheCode(sources: list<any>) #{{{2
             first_win_open = winnr()
         endif
         if source.funcname != ''
-            var func_pat = GetFuncPat(source.funcname, source.ft)
+            var func_pat: string = GetFuncPat(source.funcname, source.ft)
             try
                 exe ':/' .. func_pat
             catch /^Vim\%((\a\+)\)\=:E486:/
@@ -224,7 +226,7 @@ def ShowMeTheCode(sources: list<any>) #{{{2
 enddef
 
 def PopulateQflWithRecipes(lang: string) #{{{2
-    var items = mapnew(RECIPES[lang], (_, v) => ({
+    var items: list<dict<any>> = mapnew(RECIPES[lang], (_, v) => ({
         bufnr: bufadd(SROOTDIR .. '/' .. DB[lang][v].sources[0].path),
         module: v,
         pattern: DB[lang][v].sources[0].funcname,
@@ -275,15 +277,15 @@ def QfRunRecipe() #{{{2
     # When pressing Enter on an entry, they  would cause the current line in the
     # file we've jumped to be printed, which is distracting.
     #}}}
-    var recipe = getline('.')->matchstr('[^ |]*')
+    var recipe: string = getline('.')->matchstr('[^ |]*')
     close
-    var title = getqflist({title: 0}).title
-    var cmd = title .. ' ' .. recipe
+    var title: string = getqflist({title: 0}).title
+    var cmd: string = title .. ' ' .. recipe
     exe cmd
 enddef
 
 def CheckDb() #{{{2
-    var report = []
+    var report: list<string> = []
     # iterate over languages
     for l in keys(RECIPES)
         report += [l]
@@ -291,14 +293,14 @@ def CheckDb() #{{{2
         for r in RECIPES[l]
             # iterate over source files of a given recipe
             for s in DB[l][r].sources
-                var file = SROOTDIR .. '/' .. s.path
+                var file: string = SROOTDIR .. '/' .. s.path
                 if !filereadable(file)
                     report += [printf('    %s: "%s" is not readable', r, file)]
                 else
                     if s.funcname == ''
                         continue
                     endif
-                    var func_pat = GetFuncPat(s.funcname, s.ft)
+                    var func_pat: string = GetFuncPat(s.funcname, s.ft)
                     if readfile(file)->match(func_pat) == -1
                         report += [printf('    %s: the function "%s" is not defined in "%s"', r, s.funcname, file)]
                     endif
@@ -337,13 +339,13 @@ def GetRecipe(recipe: string): string #{{{2
 enddef
 
 def GetSources(recipe: string, lang: string): list<dict<string>> #{{{2
-    var root = matchstr(SFILE, '^.\{-}\ze/autoload/')
+    var root: string = matchstr(SFILE, '^.\{-}\ze/autoload/')
     return deepcopy(DB[lang][recipe].sources)
         ->map((_, v) => extend(v, {path: root .. '/' .. v.path, 'ft': v.ft}))
 enddef
 
 def GetFuncPat(funcname: string, ft: string): string #{{{2
-    var kwd = get({
+    var kwd: string = get({
         vim: 'fu\%[nction]!\=\|def!\=',
         lua: 'local\s\+function',
         sh: '',
@@ -352,7 +354,7 @@ def GetFuncPat(funcname: string, ft: string): string #{{{2
 enddef
 
 def IsAlreadyDisplayed(file: string): bool #{{{2
-    var files_in_tab = tabpagebuflist()
+    var files_in_tab: list<string> = tabpagebuflist()
         ->mapnew((_, v) => bufname(v)->fnamemodify(':p'))
     return index(files_in_tab, file) != -1
 enddef

@@ -5,10 +5,10 @@ var loaded = true
 
 # Interface {{{1
 def cookbook#permutations#main() #{{{2
-    var l = ['a', 'b', 'c']
-    var permutations = Permutations(l)
+    var l: list<string> = ['a', 'b', 'c']
+    var permutations: string = Permutations(l)
         ->mapnew((_, v) => join(v))->join("\n")
-    var msg = printf("the permutations of %s are:\n\n%s", l, permutations)
+    var msg: string = printf("the permutations of %s are:\n\n%s", l, permutations)
     cookbook#notify(msg, {time: 5000})
 enddef
 #}}}1

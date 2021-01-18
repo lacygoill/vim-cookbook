@@ -5,7 +5,7 @@ var loaded = true
 
 def cookbook#math#is_prime#main() #{{{1
     # Purpose: test whether a number is prime
-    var n = 1223
+    var n: number = 1223
     var msg: string
     if IsPrime(n)
         msg = n .. ' is prime'
@@ -49,14 +49,14 @@ def IsPrime(n: number): bool
     endif
 
     # We'll begin testing if `n` is divisible by 5 (first `6k ± 1` number).
-    var divisor = 5
+    var divisor: number = 5
     # `inc` is the increment we'll add to `divisor` at the end of each iteration of the while loop.{{{
     #
     # The next divisor to test is 7, so, initially, the increment needs to be 2:
     #     7 = 5 + 2
     #}}}
-    var inc = 2
-    var sqrt = sqrt(n)
+    var inc: number = 2
+    var sqrt: float = sqrt(n)
     # We could also write: `while i * i <= n`{{{
     #
     # But then, each iteration of the loop would calculate `i*i`.
