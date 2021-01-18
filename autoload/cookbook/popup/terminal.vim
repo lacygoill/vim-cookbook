@@ -63,7 +63,7 @@ def cookbook#popup#terminal#main() #{{{1
     # popup terminal) whose job may run until we quit Vim; like this one:
     # https://gist.github.com/lacygoill/0bfef0a2e70ac7015aaee56a670c124b
     #}}}
-    term_start(&shell, {hidden: v:true, term_finish: 'close', term_kill: 'hup'})
+    term_start(&shell, {hidden: true, term_finish: 'close', term_kill: 'hup'})
         # display it in popup window
         ->popup_create(opts)
 
