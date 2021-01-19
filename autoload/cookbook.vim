@@ -179,7 +179,7 @@ enddef
 def cookbook#error(msg: string): bool #{{{2
     redraw
     echohl ErrorMsg
-    echo msg
+    echom msg
     echohl NONE
     return true
 enddef
