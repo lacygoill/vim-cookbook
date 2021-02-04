@@ -102,6 +102,14 @@ const DB: dict<dict<dict<any>>> = {
                 }],
             desc: 'create a popup terminal',
         },
+        VirtualText: {
+            sources: [{
+                funcname: 'cookbook#virtualtext#main',
+                path: 'autoload/cookbook/virtualtext.vim',
+                ft: 'vim'
+                }],
+            desc: 'emulate a trailing "virtual" text at the end of a "real" line of text',
+        },
     },
     git: {
         BisectWithScript: {
@@ -356,6 +364,6 @@ enddef
 def IsAlreadyDisplayed(file: string): bool #{{{2
     var files_in_tab: list<string> = tabpagebuflist()
         ->mapnew((_, v) => bufname(v)->fnamemodify(':p'))
-    return index(files_in_tab, file) != -1
+    return index(files_in_tab, file) >= 0
 enddef
 

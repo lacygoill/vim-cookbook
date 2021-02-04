@@ -12,6 +12,8 @@ const OPTS: dict<any> = {
     borderchars: ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
     }
 
+const MAX_ZINDEX: number = 32'000
+
 def cookbook#popup#terminal#main() #{{{1
     # set options
     var opts: dict<any> = {}
@@ -43,10 +45,7 @@ def cookbook#popup#terminal#main() #{{{1
         borderchars: OPTS.borderchars,
         borderhighlight: [OPTS.highlight],
         padding: [0, 1, 0, 1],
-        # get the lowest `zindex` possible to be able to see the popup;
-        # if it's too low, it may be hidden by an existing popup,
-        # and if it's too high, it may hide future popups
-        zindex: GetZindex(),
+        zindex: MAX_ZINDEX,
         })
 
     # create terminal buffer
@@ -90,16 +89,6 @@ def GetGeometry(): list<number> #{{{1
     var col: number = float2nr(OPTS.xoffset * (&columns - width)) - 1
 
     return [row, col, width, height]
-enddef
-
-def GetZindex(): number #{{{1
-    # get screen position of the cursor
-    var screenpos: dict<number> = win_getid()->screenpos(line('.'), col('.'))
-    # use it to get the id of the popup at the cursor, then the options of the latter
-    var opts: dict<any> = popup_locate(screenpos.row, screenpos.col)->popup_getoptions()
-    # return the `zindex` value of the popup at the cursor, plus one so that our
-    # popup terminal barely wins
-    return get(opts, 'zindex', 0) + 1
 enddef
 
 def FireTerminalEvents() #{{{1
