@@ -29,6 +29,10 @@ def cookbook#virtualtext#main()
         line: -1,
         padding: [0, 0, 0, left_padding],
         mask: [[1, left_padding, 1, 1]],
+        # Never move the popup to the left.
+        # Even if it has to be truncated at the right edge of the screen.
+        fixed: true,
+        wrap: false,
         })
 enddef
 

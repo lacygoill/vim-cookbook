@@ -16,7 +16,7 @@ def cookbook#math#is_prime#main() #{{{1
 enddef
 
 def IsPrime(n: number): bool
-    if type(n) != v:t_number || n < 0
+    if typename(n) != 'number' || n < 0
         return false
     endif
 
