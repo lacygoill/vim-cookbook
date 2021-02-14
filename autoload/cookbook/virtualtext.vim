@@ -1,4 +1,4 @@
-vim9
+vim9script
 
 def cookbook#virtualtext#main()
     var lines: list<string> =<< trim END
