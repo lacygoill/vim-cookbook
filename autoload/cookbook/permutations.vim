@@ -7,7 +7,8 @@ var loaded = true
 def cookbook#permutations#main() #{{{2
     var l: list<string> = ['a', 'b', 'c']
     var permutations: string = Permutations(l)
-        ->mapnew((_, v) => join(v))->join("\n")
+        ->mapnew((_, v: list<string>): string => join(v))
+        ->join("\n")
     var msg: string = printf("the permutations of %s are:\n\n%s", l, permutations)
     cookbook#notify(msg, {time: 5000})
 enddef

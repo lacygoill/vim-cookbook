@@ -127,9 +127,11 @@ const DB: dict<dict<dict<any>>> = {
     },
     }
 
-var recipes_per_lang: list<dict<list<string>>> = keys(DB)->mapnew((_, v) => ({[v]: keys(DB[v])}))
+var recipes_per_lang: list<dict<list<string>>> = keys(DB)
+    ->mapnew((_, v: string): dict<list<string>> => ({[v]: keys(DB[v])}))
 var RECIPES: dict<list<string>> = {}
-map(recipes_per_lang, (_, v) => extend(RECIPES, v))
+recipes_per_lang
+    ->map((_, v: dict<list<string>>): dict<list<string>> => extend(RECIPES, v))
 lockvar! RECIPES
 
 const SFILE: string = expand('<sfile>:p')
@@ -234,12 +236,13 @@ def ShowMeTheCode(sources: list<any>) #{{{2
 enddef
 
 def PopulateQflWithRecipes(lang: string) #{{{2
-    var items: list<dict<any>> = mapnew(RECIPES[lang], (_, v) => ({
-        bufnr: bufadd(SROOTDIR .. '/' .. DB[lang][v].sources[0].path),
-        module: v,
-        pattern: DB[lang][v].sources[0].funcname,
-        text: DB[lang][v].desc,
-        }))
+    var items: list<dict<any>> = RECIPES[lang]
+        ->mapnew((_, v: string): dict<any> => ({
+            bufnr: bufadd(SROOTDIR .. '/' .. DB[lang][v].sources[0].path),
+            module: v,
+            pattern: DB[lang][v].sources[0].funcname,
+            text: DB[lang][v].desc,
+            }))
     setqflist([], ' ', {
         items: items,
         title: ':Cookbook -lang ' .. lang,
@@ -348,8 +351,11 @@ enddef
 
 def GetSources(recipe: string, lang: string): list<dict<string>> #{{{2
     var root: string = matchstr(SFILE, '^.\{-}\ze/autoload/')
-    return deepcopy(DB[lang][recipe].sources)
-        ->map((_, v) => extend(v, {path: root .. '/' .. v.path, 'ft': v.ft}))
+    return DB[lang][recipe].sources
+        ->deepcopy()
+        ->map((_, v: dict<string>): dict<string> =>
+            extend(v, {path: root .. '/' .. v.path, 'ft': v.ft})
+            )
 enddef
 
 def GetFuncPat(funcname: string, ft: string): string #{{{2
@@ -363,7 +369,7 @@ enddef
 
 def IsAlreadyDisplayed(file: string): bool #{{{2
     var files_in_tab: list<string> = tabpagebuflist()
-        ->mapnew((_, v) => bufname(v)->fnamemodify(':p'))
+        ->mapnew((_, v: number): string => bufname(v)->fnamemodify(':p'))
     return index(files_in_tab, file) >= 0
 enddef
 

@@ -22,7 +22,7 @@ def ReadNumber(n: number): string
     var million: number
     var billion: number
     [thousand, million, billion] = range(3)
-        ->map((_, v) => pow(10, (v + 1) * 3)->float2nr())
+        ->map((_, v: number): number => pow(10, (v + 1) * 3)->float2nr())
     if n >= billion
         return ReadNumber(n / billion) .. ' billion ' .. ReadNumber(n % billion)
     elseif n >= million
