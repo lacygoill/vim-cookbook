@@ -6,7 +6,6 @@ var loaded = true
 # Init {{{1
 
 import Catch from 'lg.vim'
-import Popup_notification from 'lg/popup.vim'
 
 # TODO: To find a recipe among many, consider including a 'tag' key in the database.{{{
 #
@@ -129,7 +128,7 @@ const DB: dict<dict<dict<any>>> = {
 
 var recipes_per_lang: list<dict<list<string>>> = keys(DB)
     ->mapnew((_, v: string): dict<list<string>> => ({[v]: keys(DB[v])}))
-var RECIPES: dict<list<string>> = {}
+var RECIPES: dict<list<string>>
 recipes_per_lang
     ->map((_, v: dict<list<string>>): dict<list<string>> => extend(RECIPES, v))
 lockvar! RECIPES
@@ -162,7 +161,7 @@ def cookbook#main(args: string) #{{{2
     if lang != 'vim'
         return
     endif
-    var funcname: string = DB[lang][recipe].sources[0].funcname
+    var funcname: string = DB[lang][recipe]['sources'][0]['funcname']
     try
         call(funcname, [])
     catch /^Vim\%((\a\+)\)\=:E119:/
@@ -192,14 +191,6 @@ def cookbook#error(msg: string): bool #{{{2
     echom msg
     echohl NONE
     return true
-enddef
-
-def cookbook#notify(msg: string, opts: dict<number> = {}) #{{{2
-    try
-        call('Popup_notification', [msg, opts])
-    catch /^Vim\%((\a\+)\)\=:E117:/
-        cookbook#error('need Popup_notification(); install vim-lg-lib')
-    endtry
 enddef
 #}}}1
 # Core {{{1
@@ -238,10 +229,10 @@ enddef
 def PopulateQflWithRecipes(lang: string) #{{{2
     var items: list<dict<any>> = RECIPES[lang]
         ->mapnew((_, v: string): dict<any> => ({
-            bufnr: bufadd(SROOTDIR .. '/' .. DB[lang][v].sources[0].path),
+            bufnr: bufadd(SROOTDIR .. '/' .. DB[lang][v]['sources'][0]['path']),
             module: v,
-            pattern: DB[lang][v].sources[0].funcname,
-            text: DB[lang][v].desc,
+            pattern: DB[lang][v]['sources'][0]['funcname'],
+            text: DB[lang][v]['desc'],
             }))
     setqflist([], ' ', {
         items: items,
@@ -296,14 +287,14 @@ def QfRunRecipe() #{{{2
 enddef
 
 def CheckDb() #{{{2
-    var report: list<string> = []
+    var report: list<string>
     # iterate over languages
     for l in keys(RECIPES)
         report += [l]
         # iterate over recipes in a given language
         for r in RECIPES[l]
             # iterate over source files of a given recipe
-            for s in DB[l][r].sources
+            for s in DB[l][r]['sources']
                 var file: string = SROOTDIR .. '/' .. s.path
                 if !filereadable(file)
                     report += [printf('    %s: "%s" is not readable', r, file)]
@@ -351,7 +342,7 @@ enddef
 
 def GetSources(recipe: string, lang: string): list<dict<string>> #{{{2
     var root: string = matchstr(SFILE, '^.\{-}\ze/autoload/')
-    return DB[lang][recipe].sources
+    return DB[lang][recipe]['sources']
         ->deepcopy()
         ->map((_, v: dict<string>): dict<string> =>
             extend(v, {path: root .. '/' .. v.path, 'ft': v.ft})

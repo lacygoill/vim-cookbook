@@ -36,10 +36,6 @@ enddef
 # Util {{{1
 def EchoChoice(line: string) #{{{2
     var msg: string = 'you chose ' .. line
-    try
-        Popup_notification(msg)
-    catch /^Vim\%((\a\+)\)\=:E117:/
-        call cookbook#error('need Popup_notification(); install vim-lg-lib')
-    endtry
+    Popup_notification(msg)
 enddef
 

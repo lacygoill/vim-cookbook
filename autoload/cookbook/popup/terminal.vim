@@ -16,7 +16,7 @@ const MAX_ZINDEX: number = 32'000
 
 def cookbook#popup#terminal#main() #{{{1
     # set options
-    var opts: dict<any> = {}
+    var opts: dict<any>
     [opts.line, opts.col, opts.minwidth, opts.minheight] = GetGeometry()
     extend(opts, {
         maxwidth: opts.minwidth,

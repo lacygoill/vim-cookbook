@@ -3,6 +3,8 @@ vim9script noclear
 if exists('loaded') | finish | endif
 var loaded = true
 
+import Popup_notification from 'lg/popup.vim'
+
 def cookbook#math#read_number#main() #{{{1
     # Purpose:{{{
     #
@@ -14,7 +16,7 @@ def cookbook#math#read_number#main() #{{{1
     #}}}
     var n: number = 1234
     var msg: string = printf("in english, %d can be read as\n%s", n, ReadNumber(n))
-    cookbook#notify(msg, {time: 5000})
+    Popup_notification(msg, {time: 5000})
 enddef
 
 def ReadNumber(n: number): string

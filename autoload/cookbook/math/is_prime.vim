@@ -3,6 +3,8 @@ vim9script noclear
 if exists('loaded') | finish | endif
 var loaded = true
 
+import Popup_notification from 'lg/popup.vim'
+
 def cookbook#math#is_prime#main() #{{{1
     # Purpose: test whether a number is prime
     var n: number = 1223
@@ -12,7 +14,7 @@ def cookbook#math#is_prime#main() #{{{1
     else
         msg = n .. ' is not prime'
     endif
-    cookbook#notify(msg)
+    Popup_notification(msg, {})
 enddef
 
 def IsPrime(n: number): bool

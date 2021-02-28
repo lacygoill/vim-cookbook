@@ -3,6 +3,8 @@ vim9script noclear
 if exists('loaded') | finish | endif
 var loaded = true
 
+import Popup_notification from 'lg/popup.vim'
+
 # Interface {{{1
 def cookbook#permutations#main() #{{{2
     var l: list<string> = ['a', 'b', 'c']
@@ -10,7 +12,7 @@ def cookbook#permutations#main() #{{{2
         ->mapnew((_, v: list<string>): string => join(v))
         ->join("\n")
     var msg: string = printf("the permutations of %s are:\n\n%s", l, permutations)
-    cookbook#notify(msg, {time: 5000})
+    Popup_notification(msg, {time: 5000})
 enddef
 #}}}1
 # Core {{{1
