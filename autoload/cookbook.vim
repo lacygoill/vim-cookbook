@@ -55,7 +55,7 @@ const DB: dict<dict<dict<any>>> = {
         },
         MathIsPrime: {
             sources: [{
-                funcname: 'cookbook#math#is_prime#main',
+                funcname: 'cookbook#math#isPrime#main',
                 path: 'autoload/cookbook/math/is_prime.vim',
                 ft: 'vim'
                 }],
@@ -63,7 +63,7 @@ const DB: dict<dict<dict<any>>> = {
         },
         MathReadNumber: {
             sources: [{
-                funcname: 'cookbook#math#read_number#main',
+                funcname: 'cookbook#math#readNumber#main',
                 path: 'autoload/cookbook/math/read_number.vim',
                 ft: 'vim'
                 }],

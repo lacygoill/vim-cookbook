@@ -5,7 +5,7 @@ var loaded = true
 
 import Popup_notification from 'lg/popup.vim'
 
-def cookbook#math#is_prime#main() #{{{1
+def cookbook#math#isPrime#main() #{{{1
     # Purpose: test whether a number is prime
     var n: number = 1223
     var msg: string

@@ -5,7 +5,7 @@ var loaded = true
 
 import Popup_notification from 'lg/popup.vim'
 
-def cookbook#math#read_number#main() #{{{1
+def cookbook#math#readNumber#main() #{{{1
     # Purpose:{{{
     #
     # Takes a number as input; outputs the english word standing for that number.
