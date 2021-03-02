@@ -18,7 +18,7 @@ def cookbook#popup#terminal#main() #{{{1
     # set options
     var opts: dict<any>
     [opts.line, opts.col, opts.minwidth, opts.minheight] = GetGeometry()
-    extend(opts, {
+    opts = extendnew(opts, {
         maxwidth: opts.minwidth,
         maxheight: opts.minheight,
         # Make sure empty cells are highlighted just like non-empty cells in Terminal-Normal mode.{{{

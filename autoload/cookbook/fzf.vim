@@ -23,14 +23,12 @@ def cookbook#fzf#color() #{{{2
     # Purpose: filter a list of lines with fzf; color some part of the lines
     var source: list<string> = ['1. one', '2. two', '3. three', '4. four', '5. five']
         ->map((_, v: string): string =>
-            substitute(v, '\d', "\x1b[38;5;" .. MYCOLOR .. "m&\x1b[0m", '')
-            )
+                v->substitute('\d', "\x1b[38;5;" .. MYCOLOR .. "m&\x1b[0m", ''))
     fzf#wrap({
         source: source,
         options: '--ansi',
         sink: EchoChoice,
-        })
-        ->fzf#run()
+    })->fzf#run()
 enddef
 #}}}1
 # Util {{{1

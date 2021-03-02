@@ -56,7 +56,7 @@ const DB: dict<dict<dict<any>>> = {
         MathIsPrime: {
             sources: [{
                 funcname: 'cookbook#math#isPrime#main',
-                path: 'autoload/cookbook/math/is_prime.vim',
+                path: 'autoload/cookbook/math/isPrime.vim',
                 ft: 'vim'
                 }],
             desc: 'test whether a number is prime',
@@ -64,7 +64,7 @@ const DB: dict<dict<dict<any>>> = {
         MathReadNumber: {
             sources: [{
                 funcname: 'cookbook#math#readNumber#main',
-                path: 'autoload/cookbook/math/read_number.vim',
+                path: 'autoload/cookbook/math/readNumber.vim',
                 ft: 'vim'
                 }],
             desc: 'read a numeric number in english words',
@@ -229,11 +229,11 @@ enddef
 def PopulateQflWithRecipes(lang: string) #{{{2
     var items: list<dict<any>> = RECIPES[lang]
         ->mapnew((_, v: string): dict<any> => ({
-            bufnr: bufadd(SROOTDIR .. '/' .. DB[lang][v]['sources'][0]['path']),
-            module: v,
-            pattern: DB[lang][v]['sources'][0]['funcname'],
-            text: DB[lang][v]['desc'],
-            }))
+                bufnr: bufadd(SROOTDIR .. '/' .. DB[lang][v]['sources'][0]['path']),
+                module: v,
+                pattern: DB[lang][v]['sources'][0]['funcname'],
+                text: DB[lang][v]['desc'],
+                }))
     setqflist([], ' ', {
         items: items,
         title: ':Cookbook -lang ' .. lang,
@@ -337,7 +337,7 @@ def GetCurlang(args: string): string #{{{2
 enddef
 
 def GetRecipe(recipe: string): string #{{{2
-    return substitute(recipe, '-lang\s\+\S\+\s*', '', '')
+    return recipe->substitute('-lang\s\+\S\+\s*', '', '')
 enddef
 
 def GetSources(recipe: string, lang: string): list<dict<string>> #{{{2
@@ -345,8 +345,7 @@ def GetSources(recipe: string, lang: string): list<dict<string>> #{{{2
     return DB[lang][recipe]['sources']
         ->deepcopy()
         ->map((_, v: dict<string>): dict<string> =>
-            extend(v, {path: root .. '/' .. v.path, 'ft': v.ft})
-            )
+                extend(v, {path: root .. '/' .. v.path, ft: v.ft}))
 enddef
 
 def GetFuncPat(funcname: string, ft: string): string #{{{2
