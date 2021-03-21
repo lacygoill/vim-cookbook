@@ -171,8 +171,8 @@ def cookbook#main(args: string) #{{{2
 enddef
 
 def cookbook#complete(arglead: string, cmdline: string, pos: number): string #{{{2
-    var from_dash_to_cursor: string = matchstr(cmdline,
-        '.*\s\zs-.*\%' .. (pos + 1) .. 'c')
+    var from_dash_to_cursor: string = cmdline
+        ->matchstr('.*\s\zs-.*\%' .. (pos + 1) .. 'c')
     if from_dash_to_cursor =~ '\C^-lang\s*\S*$'
         return keys(DB)->join("\n")
     elseif arglead[0] == '-'
@@ -279,7 +279,8 @@ def QfRunRecipe() #{{{2
     # When pressing Enter on an entry, they  would cause the current line in the
     # file we've jumped to be printed, which is distracting.
     #}}}
-    var recipe: string = getline('.')->matchstr('[^ |]*')
+    var line: string = getline('.')
+    var recipe: string = line->strpart(0, line->stridx('|'))
     close
     var title: string = getqflist({title: 0}).title
     var cmd: string = title .. ' ' .. recipe
@@ -320,7 +321,7 @@ enddef
 #}}}1
 # Util {{{1
 def IsInvalid(recipe: string, lang: string): bool #{{{2
-    if !(has_key(DB, lang) && has_key(DB[lang], recipe))
+    if !(DB->has_key(lang) && DB[lang]->has_key(recipe))
         return cookbook#error(recipe .. ' is not a known recipe')
     endif
     return false
@@ -329,7 +330,7 @@ enddef
 def GetCurlang(args: string): string #{{{2
     if args =~ '\C\%(^\|\s\)-lang\s'
         return matchstr(args, '-lang\s\+\zs\S\+')
-    elseif &ft != '' && has_key(RECIPES, &ft)
+    elseif &ft != '' && RECIPES->has_key(&ft)
         return &ft
     else
         return 'vim'
@@ -341,7 +342,7 @@ def GetRecipe(recipe: string): string #{{{2
 enddef
 
 def GetSources(recipe: string, lang: string): list<dict<string>> #{{{2
-    var root: string = matchstr(SFILE, '^.\{-}\ze/autoload/')
+    var root: string = SFILE->strpart(0, SFILE->match('/autoload'))
     return DB[lang][recipe]['sources']
         ->deepcopy()
         ->map((_, v: dict<string>): dict<string> =>

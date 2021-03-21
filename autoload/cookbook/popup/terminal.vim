@@ -60,7 +60,7 @@ def cookbook#popup#terminal#main() #{{{1
     #
     # This is  only necessary for  a persistent terminal buffer  (e.g. togglable
     # popup terminal) whose job may run until we quit Vim; like this one:
-    # https://gist.github.com/nicsig/798ad620d6002574718e000ce9050965
+    # https://gist.github.com/lacygoill/0bfef0a2e70ac7015aaee56a670c124b
     #}}}
     term_start(&shell, {hidden: true, term_finish: 'close', term_kill: 'hup'})
         # display it in popup window
