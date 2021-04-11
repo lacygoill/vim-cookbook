@@ -32,7 +32,11 @@ def Permutations(l: list<string>): list<list<string>> #{{{2
     return ret
 enddef
 
-def InsertItemAtAllPositions(item: string, l: list<string>): list<list<string>> #{{{2
+def InsertItemAtAllPositions( #{{{2
+    item: string,
+    l: list<string>
+): list<list<string>>
+
     var ret: list<list<string>>
     # iterate over all the positions at which we can insert the item in the list
     for i in range(len(l) + 1)

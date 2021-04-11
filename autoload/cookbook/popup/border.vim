@@ -24,7 +24,7 @@ def cookbook#popup#border#main()
         # it's aesthetically pleasing to have 2 padding columns on the left/right, but no padding lines above/below;
         # the padding is highlighted according to `highlight`, not `borderhighlight`
         padding: [0, 1, 0, 1],
-        }
+    }
     popup_create(what, opts)
 enddef
 

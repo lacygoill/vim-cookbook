@@ -20,7 +20,7 @@ def cookbook#virtualtext#main()
         type: 'textprop',
         length: length,
         bufnr: buf,
-        })
+    })
 
     var left_padding: number = col([lnum, '$']) - length - col + 1
     var id: number = popup_create('attached to "jumps"', {
@@ -33,6 +33,6 @@ def cookbook#virtualtext#main()
         # Even if it has to be truncated at the right edge of the screen.
         fixed: true,
         wrap: false,
-        })
+    })
 enddef
 

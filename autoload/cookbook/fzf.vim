@@ -15,8 +15,7 @@ def cookbook#fzf#basic() #{{{2
     fzf#wrap({
         source: source,
         sink: EchoChoice,
-        })
-        ->fzf#run()
+    })->fzf#run()
 enddef
 
 def cookbook#fzf#color() #{{{2

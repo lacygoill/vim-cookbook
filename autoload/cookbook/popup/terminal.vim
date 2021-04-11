@@ -10,7 +10,7 @@ const OPTS: dict<any> = {
     yoffset: 0.5,
     highlight: 'WarningMsg',
     borderchars: ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
-    }
+}
 
 const MAX_ZINDEX: number = 32'000
 
@@ -22,21 +22,21 @@ def cookbook#popup#terminal#main() #{{{1
         maxwidth: opts.minwidth,
         maxheight: opts.minheight,
         # Make sure empty cells are highlighted just like non-empty cells in Terminal-Normal mode.{{{
-        # .
+        #
         # When  you're in  Terminal-Job  mode, everything  is highlighted  according
         # to  Vim's  internal   terminal  palette  (which  can   be  configured  via
         # `g:terminal_ansi_colors`).
-        # .
+        #
         # When you're in Terminal-Normal mode:
-        # .
+        #
         #    - the non-empty cells are still highlighted according to Vim's internal terminal palette
         #    - the empty cells are highlighted according the 'highlight' key, or `Pmenu` as a fallback
-        # .
+        #
         # We want all cells to be highlighted in the exact same way; so we make sure
         # that empty cells are highlighted just like the non-empty ones.
-        # .
+        #
         # ---
-        # .
+        #
         # The same issue applies to empty  cells in the padding areas, regardless of
         # the mode you're in.
         # }}}
@@ -46,7 +46,7 @@ def cookbook#popup#terminal#main() #{{{1
         borderhighlight: [OPTS.highlight],
         padding: [0, 1, 0, 1],
         zindex: MAX_ZINDEX,
-        })
+    })
 
     # create terminal buffer
     # `term_finish: 'close'` is useful if you close the terminal by pressing `C-d` or running `$ exit`.{{{

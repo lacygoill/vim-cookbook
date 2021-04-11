@@ -124,7 +124,7 @@ const DB: dict<dict<dict<any>>> = {
             desc: 'bisect a commit automatically using a shell script',
         },
     },
-    }
+}
 
 var recipes_per_lang: list<dict<list<string>>> = keys(DB)
     ->mapnew((_, v: string): dict<list<string>> => ({[v]: keys(DB[v])}))
@@ -170,18 +170,23 @@ def cookbook#main(args: string) #{{{2
     endtry
 enddef
 
-def cookbook#complete(arglead: string, cmdline: string, pos: number): string #{{{2
+def cookbook#complete( #{{{2
+    arglead: string,
+    cmdline: string,
+    pos: number
+): string
+
     var from_dash_to_cursor: string = cmdline
         ->matchstr('.*\s\zs-.*\%' .. (pos + 1) .. 'c')
     if from_dash_to_cursor =~ '\C^-lang\s*\S*$'
         return keys(DB)->join("\n")
     elseif arglead[0] == '-'
         var options: list<string> = ['-check_db', '-lang']
-        return join(options, "\n")
+        return options->join("\n")
     else
         var curlang: string = GetCurlang(cmdline)
         var matches: list<string> = get(RECIPES, curlang, [])
-        return join(matches, "\n")
+        return matches->join("\n")
     endif
 enddef
 
@@ -233,12 +238,12 @@ def PopulateQflWithRecipes(lang: string) #{{{2
                 module: v,
                 pattern: DB[lang][v]['sources'][0]['funcname'],
                 text: DB[lang][v]['desc'],
-                }))
+        }))
     setqflist([], ' ', {
         items: items,
         title: ':Cookbook -lang ' .. lang,
-        quickfixtextfunc: () => [],
-        })
+        quickfixtextfunc: (_) => [],
+    })
     cw
     if &bt != 'quickfix'
         return

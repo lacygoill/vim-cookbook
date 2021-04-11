@@ -20,7 +20,7 @@ def cookbook#popup#basic#main()
         minheight: 15,
         maxheight: 15,
         highlight: 'Visual',
-        }
+    }
     popup_create(what, opts)
 enddef
 
