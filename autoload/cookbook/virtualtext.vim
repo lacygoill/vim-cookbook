@@ -1,4 +1,4 @@
-vim9script
+vim9script noclear
 
 def cookbook#virtualtext#main()
     var lines: list<string> =<< trim END
