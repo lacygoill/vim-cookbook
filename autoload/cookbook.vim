@@ -185,7 +185,7 @@ def cookbook#complete( #{{{2
         return options->join("\n")
     else
         var curlang: string = GetCurlang(cmdline)
-        var matches: list<string> = get(RECIPES, curlang, [])
+        var matches: list<string> = RECIPES->get(curlang, [])
         return matches->join("\n")
     endif
 enddef
@@ -201,7 +201,7 @@ enddef
 # Core {{{1
 def ShowMeTheCode(sources: list<any>) #{{{2
     var first_win_open: number
-    var i: number = 0 | for source in sources | i += 1
+    var i: number = 0 | for source in sources | ++i
         if IsAlreadyDisplayed(source.path)
             continue
         endif
@@ -218,7 +218,7 @@ def ShowMeTheCode(sources: list<any>) #{{{2
         if source.funcname != ''
             var func_pat: string = GetFuncPat(source.funcname, source.ft)
             try
-                exe ':/' .. func_pat
+                search(func_pat)
             catch /^Vim\%((\a\+)\)\=:E486:/
                 Catch()
                 return
@@ -227,7 +227,7 @@ def ShowMeTheCode(sources: list<any>) #{{{2
         norm! zMzv
     endfor
     if first_win_open != 0
-        exe ':' .. first_win_open .. 'wincmd w'
+        win_getid(first_win_open)->win_gotoid()
     endif
 enddef
 
@@ -245,7 +245,7 @@ def PopulateQflWithRecipes(lang: string) #{{{2
         quickfixtextfunc: (_) => [],
     })
     cw
-    if &bt != 'quickfix'
+    if &buftype != 'quickfix'
         return
     endif
     ConcealNoise()
@@ -334,9 +334,9 @@ enddef
 
 def GetCurlang(args: string): string #{{{2
     if args =~ '\C\%(^\|\s\)-lang\s'
-        return matchstr(args, '-lang\s\+\zs\S\+')
-    elseif &ft != '' && RECIPES->has_key(&ft)
-        return &ft
+        return args->matchstr('-lang\s\+\zs\S\+')
+    elseif &filetype != '' && RECIPES->has_key(&filetype)
+        return &filetype
     else
         return 'vim'
     endif
