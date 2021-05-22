@@ -12,7 +12,7 @@ def cookbook#math#readNumber#main() #{{{1
     # E.g.:
     #
     #     :call cookbook#math#read_number(123)
-    #     one hundred twenty three~
+    #     one hundred twenty three˜
     #}}}
     var n: number = 1234
     var msg: string = printf("in english, %d can be read as\n%s", n, ReadNumber(n))
