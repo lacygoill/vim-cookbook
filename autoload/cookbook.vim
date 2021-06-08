@@ -41,72 +41,72 @@ const DB: dict<dict<dict<any>>> = {
             sources: [{
                 funcname: 'cookbook#fzf#basic',
                 path: 'autoload/cookbook/fzf.vim',
-                ft: 'vim'
-                }],
+                filetype: 'vim'
+            }],
             desc: 'filter some output via fzf',
         },
         FzfWithColors: {
             sources: [{
                 funcname: 'cookbook#fzf#color',
                 path: 'autoload/cookbook/fzf.vim',
-                ft: 'vim'
-                }],
+                filetype: 'vim'
+            }],
             desc: 'filter some output via fzf, coloring some part of it',
         },
         MathIsPrime: {
             sources: [{
                 funcname: 'cookbook#math#isPrime#main',
                 path: 'autoload/cookbook/math/isPrime.vim',
-                ft: 'vim'
-                }],
+                filetype: 'vim'
+            }],
             desc: 'test whether a number is prime',
         },
         MathReadNumber: {
             sources: [{
                 funcname: 'cookbook#math#readNumber#main',
                 path: 'autoload/cookbook/math/readNumber.vim',
-                ft: 'vim'
-                }],
+                filetype: 'vim'
+            }],
             desc: 'read a numeric number in english words',
         },
         Permutations: {
             sources: [{
                 funcname: 'cookbook#permutations#main',
                 path: 'autoload/cookbook/permutations.vim',
-                ft: 'vim'
-                }],
+                filetype: 'vim'
+            }],
             desc: 'get all permutations of items in a list',
         },
         PopupBasic: {
             sources: [{
                 funcname: 'cookbook#popup#basic#main',
                 path: 'autoload/cookbook/popup/basic.vim',
-                ft: 'vim'
-                }],
+                filetype: 'vim'
+            }],
             desc: 'create a basic popup',
         },
         PopupBorder: {
             sources: [{
                 funcname: 'cookbook#popup#border#main',
                 path: 'autoload/cookbook/popup/border.vim',
-                ft: 'vim'
-                }],
+                filetype: 'vim'
+            }],
             desc: 'create a popup with border',
         },
         PopupTerminal: {
             sources: [{
                 funcname: 'cookbook#popup#terminal#main',
                 path: 'autoload/cookbook/popup/terminal.vim',
-                ft: 'vim'
-                }],
+                filetype: 'vim'
+            }],
             desc: 'create a popup terminal',
         },
         VirtualText: {
             sources: [{
                 funcname: 'cookbook#virtualtext#main',
                 path: 'autoload/cookbook/virtualtext.vim',
-                ft: 'vim'
-                }],
+                filetype: 'vim'
+            }],
             desc: 'emulate a trailing "virtual" text at the end of a "real" line of text',
         },
     },
@@ -115,12 +115,12 @@ const DB: dict<dict<dict<any>>> = {
             sources: [{
                 funcname: '',
                 path: 'autoload/cookbook/git/bisect/bisect',
-                ft: 'sh'
-                }, {
+                filetype: 'sh'
+            }, {
                 funcname: '',
                 path: 'autoload/cookbook/git/bisect/bisect.vim',
-                ft: 'vim'
-                }],
+                filetype: 'vim'
+            }],
             desc: 'bisect a commit automatically using a shell script',
         },
     },
@@ -216,7 +216,7 @@ def ShowMeTheCode(sources: list<any>) #{{{2
             first_win_open = winnr()
         endif
         if source.funcname != ''
-            var func_pat: string = GetFuncPat(source.funcname, source.ft)
+            var func_pat: string = GetFuncPat(source.funcname, source.filetype)
             try
                 search(func_pat)
             catch /^Vim\%((\a\+)\)\=:E486:/
@@ -270,7 +270,8 @@ enddef
 var qfid: list<dict<number>>
 
 def ConcealNoise() #{{{2
-    setl cocu=nc cole=3
+    &l:concealcursor = 'nc'
+    &l:conceallevel = 3
     matchadd('Conceal', '^.\{-}\zs|.\{-}|\ze\s*', 0, -1, {conceal: 'x'})
 enddef
 
@@ -308,7 +309,7 @@ def CheckDb() #{{{2
                     if s.funcname == ''
                         continue
                     endif
-                    var func_pat: string = GetFuncPat(s.funcname, s.ft)
+                    var func_pat: string = GetFuncPat(s.funcname, s.filetype)
                     if readfile(file)->match(func_pat) == -1
                         report += [printf('    %s: the function "%s" is not defined in "%s"', r, s.funcname, file)]
                     endif
@@ -321,7 +322,7 @@ def CheckDb() #{{{2
         return
     endif
     new
-    setline(1, report)
+    report->setline(1)
 enddef
 #}}}1
 # Util {{{1
@@ -351,15 +352,15 @@ def GetSources(recipe: string, lang: string): list<dict<string>> #{{{2
     return DB[lang][recipe]['sources']
         ->deepcopy()
         ->map((_, v: dict<string>): dict<string> =>
-                extend(v, {path: root .. '/' .. v.path, ft: v.ft}))
+                extend(v, {path: root .. '/' .. v.path, filetype: v.filetype}))
 enddef
 
-def GetFuncPat(funcname: string, ft: string): string #{{{2
+def GetFuncPat(funcname: string, filetype: string): string #{{{2
     var kwd: string = get({
         vim: 'fu\%[nction]!\=\|def!\=',
         lua: 'local\s\+function',
         sh: '',
-        }, ft, '')
+    }, filetype, '')
     return '^\s*' .. kwd .. (kwd == '' ? '\s*' : '\s\+') .. funcname .. '('
 enddef
 

@@ -70,7 +70,7 @@ def cookbook#popup#terminal#main() #{{{1
     # reset to its default value (empty string), which makes Vim use `C-w`.
     # Set the option  again, so that we  get the same experience  as in terminal
     # buffers in non-popup windows.
-    set twk<
+    set termwinkey<
 
     FireTerminalEvents()
 enddef

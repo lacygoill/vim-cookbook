@@ -1,3 +1,5 @@
+vim9script noclear
+
 def cookbook#popup#basic#main()
     # `what` could also be set to:{{{
     #

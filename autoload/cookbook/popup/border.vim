@@ -1,3 +1,5 @@
+vim9script noclear
+
 def cookbook#popup#border#main()
     var what: list<string> = ['foo', 'bar', 'baz']
     var opts: dict<any> = {
