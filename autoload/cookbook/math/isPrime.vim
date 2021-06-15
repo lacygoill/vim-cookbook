@@ -7,7 +7,7 @@ import Popup_notification from 'lg/popup.vim'
 
 def cookbook#math#isPrime#main() #{{{1
     # Purpose: test whether a number is prime
-    var n: number = 1223
+    var n: number = 1'223
     var msg: string
     if IsPrime(n)
         msg = n .. ' is prime'

@@ -14,9 +14,9 @@ def cookbook#math#readNumber#main() #{{{1
     #     :call cookbook#math#read_number(123)
     #     one hundred twenty three˜
     #}}}
-    var n: number = 1234
+    var n: number = 1'234
     var msg: string = printf("in english, %d can be read as\n%s", n, ReadNumber(n))
-    Popup_notification(msg, {time: 5000})
+    Popup_notification(msg, {time: 5'000})
 enddef
 
 def ReadNumber(n: number): string

@@ -12,7 +12,7 @@ def cookbook#permutations#main() #{{{2
         ->mapnew((_, v: list<string>): string => join(v))
         ->join("\n")
     var msg: string = printf("the permutations of %s are:\n\n%s", l, permutations)
-    Popup_notification(msg, {time: 5000})
+    Popup_notification(msg, {time: 5'000})
 enddef
 #}}}1
 # Core {{{1
