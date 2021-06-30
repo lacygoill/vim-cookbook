@@ -193,7 +193,7 @@ enddef
 def cookbook#error(msg: string): bool #{{{2
     redraw
     echohl ErrorMsg
-    echom msg
+    echomsg msg
     echohl NONE
     return true
 enddef
@@ -207,11 +207,11 @@ def ShowMeTheCode(sources: list<any>) #{{{2
         endif
         var cmd: string
         if i == 1 && bufname('%') == '' && (line('$') + 1)->line2byte() <= 2
-            cmd = 'e'
+            cmd = 'edit'
         else
-            cmd = 'sp'
+            cmd = 'split'
         endif
-        exe cmd .. ' ' .. source.path
+        execute cmd .. ' ' .. source.path
         if i == 1
             first_win_open = winnr()
         endif
@@ -224,7 +224,7 @@ def ShowMeTheCode(sources: list<any>) #{{{2
                 return
             endtry
         endif
-        norm! zMzv
+        normal! zMzv
     endfor
     if first_win_open != 0
         win_getid(first_win_open)->win_gotoid()
@@ -244,13 +244,13 @@ def PopulateQflWithRecipes(lang: string) #{{{2
         title: ':Cookbook -lang ' .. lang,
         quickfixtextfunc: (_) => [],
     })
-    cw
+    cwindow
     if &buftype != 'quickfix'
         return
     endif
     ConcealNoise()
     qfid += [getqflist({id: 0})]
-    augroup CookbookConcealNoise | au!
+    augroup CookbookConcealNoise | autocmd!
         # Why do you inspect the qf id?  Isn't `<buffer>` enough?{{{
         #
         # Since 8.1.0877,  Vim re-uses the  *same* quickfix buffer every  time a
@@ -260,12 +260,12 @@ def PopulateQflWithRecipes(lang: string) #{{{2
         # We  need to  *also* inspect  the quickfix  id; otherwise,  the conceal
         # could be re-applied to a new qf window displaying a different qfl.
         #}}}
-        au BufWinEnter <buffer> if index(qfid, getqflist({id: 0})) >= 0
+        autocmd BufWinEnter <buffer> if index(qfid, getqflist({id: 0})) >= 0
             |     ConcealNoise()
             |     InstallMapping()
             | endif
     augroup END
-    nno <buffer><nowait> <cr> <cmd>call <sid>QfRunRecipe()<cr>
+    nnoremap <buffer><nowait> <CR> <Cmd>call <SID>QfRunRecipe()<CR>
 enddef
 var qfid: list<dict<number>>
 
@@ -276,7 +276,7 @@ def ConcealNoise() #{{{2
 enddef
 
 def InstallMapping() #{{{2
-    nno <buffer><nowait> <cr> <cmd>call <sid>QfRunRecipe()<cr>
+    nnoremap <buffer><nowait> <CR> <Cmd>call <SID>QfRunRecipe()<CR>
 enddef
 
 def QfRunRecipe() #{{{2
@@ -290,7 +290,7 @@ def QfRunRecipe() #{{{2
     close
     var title: string = getqflist({title: 0}).title
     var cmd: string = title .. ' ' .. recipe
-    exe cmd
+    execute cmd
 enddef
 
 def CheckDb() #{{{2

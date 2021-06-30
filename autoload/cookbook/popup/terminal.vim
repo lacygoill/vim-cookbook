@@ -54,7 +54,7 @@ def cookbook#popup#terminal#main() #{{{1
     # This is  not necessary when you  toggle off your custom  popup terminal by
     # pressing `C-g C-g`, but that's a special case.
     #}}}
-    # `term_kill: 'hup'` may suppress `E947` when you try to quit Vim with `:q` or `:qa`.{{{
+    # `term_kill: 'hup'` may suppress `E947` when you try to quit Vim with `:quit` or `:quitall`.{{{
     #
     #     E947: Job still running in buffer "!/usr/local/bin/zsh"
     #
@@ -94,7 +94,7 @@ enddef
 def FireTerminalEvents() #{{{1
     # Install our custom terminal settings.
     if exists('#TerminalWinOpen')
-        do <nomodeline> TerminalWinOpen
+        doautocmd <nomodeline> TerminalWinOpen
     endif
     # Vim makes us enter Terminal-Job mode immediately.{{{
     #
@@ -103,7 +103,7 @@ def FireTerminalEvents() #{{{1
     # which are applied on `User TermEnter`, you want to fire it now.
     #}}}
     if exists('#User#TermEnter')
-        do <nomodeline> User TermEnter
+        doautocmd <nomodeline> User TermEnter
     endif
 enddef
 
