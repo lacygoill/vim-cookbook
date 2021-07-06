@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 # Init {{{1
 
 import Catch from 'lg.vim'
@@ -126,11 +123,12 @@ const DB: dict<dict<dict<any>>> = {
     },
 }
 
-var recipes_per_lang: list<dict<list<string>>> = keys(DB)
-    ->mapnew((_, v: string): dict<list<string>> => ({[v]: keys(DB[v])}))
+var recipes_per_lang: list<dict<list<string>>> = DB
+    ->items()
+    ->mapnew((_, v: list<any>): dict<list<string>> => ({[v[0]]: v[1]->keys()}))
 var RECIPES: dict<list<string>>
 recipes_per_lang
-    ->map((_, v: dict<list<string>>): dict<list<string>> => extend(RECIPES, v))
+    ->map((_, v: dict<list<string>>) => extend(RECIPES, v))
 lockvar! RECIPES
 
 const SFILE: string = expand('<sfile>:p')
@@ -179,7 +177,7 @@ def cookbook#complete( #{{{2
     var from_dash_to_cursor: string = cmdline
         ->matchstr('.*\s\zs-.*\%' .. (pos + 1) .. 'c')
     if from_dash_to_cursor =~ '\C^-lang\s*\S*$'
-        return keys(DB)->join("\n")
+        return DB->keys()->join("\n")
     elseif arglead[0] == '-'
         var options: list<string> = ['-check_db', '-lang']
         return options->join("\n")
@@ -296,7 +294,7 @@ enddef
 def CheckDb() #{{{2
     var report: list<string>
     # iterate over languages
-    for l in keys(RECIPES)
+    for l in RECIPES->keys()
         report += [l]
         # iterate over recipes in a given language
         for r in RECIPES[l]
@@ -351,7 +349,7 @@ def GetSources(recipe: string, lang: string): list<dict<string>> #{{{2
     var root: string = SFILE->strpart(0, SFILE->match('/autoload'))
     return DB[lang][recipe]['sources']
         ->deepcopy()
-        ->map((_, v: dict<string>): dict<string> =>
+        ->map((_, v: dict<string>) =>
                 extend(v, {path: root .. '/' .. v.path, filetype: v.filetype}))
 enddef
 

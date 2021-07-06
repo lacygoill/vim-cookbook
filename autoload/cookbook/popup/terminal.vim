@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 const OPTS: dict<any> = {
     width: 0.9,
     height: 0.6,

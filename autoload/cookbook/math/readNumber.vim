@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 import Popup_notification from 'lg/popup.vim'
 
 def cookbook#math#readNumber#main() #{{{1
@@ -24,7 +21,7 @@ def ReadNumber(n: number): string
     var million: number
     var billion: number
     [thousand, million, billion] = range(3)
-        ->map((_, v: number): number =>
+        ->map((_, v: number) =>
                 pow(10, (v + 1) * 3)->float2nr()
     )
     if n >= billion

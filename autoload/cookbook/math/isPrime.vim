@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 import Popup_notification from 'lg/popup.vim'
 
 def cookbook#math#isPrime#main() #{{{1

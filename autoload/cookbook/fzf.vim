@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 import Popup_notification from 'lg/popup.vim'
 
 # color number in 256-color palette
@@ -21,7 +18,7 @@ enddef
 def cookbook#fzf#color() #{{{2
     # Purpose: filter a list of lines with fzf; color some part of the lines
     var source: list<string> = ['1. one', '2. two', '3. three', '4. four', '5. five']
-        ->map((_, v: string): string =>
+        ->map((_, v: string) =>
                 v->substitute('\d', "\x1b[38;5;" .. MYCOLOR .. "m&\x1b[0m", ''))
     fzf#wrap({
         source: source,
