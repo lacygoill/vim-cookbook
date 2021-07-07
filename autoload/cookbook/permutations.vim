@@ -20,9 +20,9 @@ def Permutations(l: list<string>): list<list<string>> #{{{2
     endif
     var ret: list<list<string>>
     # iterate over the permutations of the sublist which excludes the first item
-    for sublistPermutation in Permutations(l[1 :])
+    for sublistPermutation: list<string> in Permutations(l[1 :])
     # iterate over the permutations of the original list
-        for permutation in InsertItemAtAllPositions(l[0], sublistPermutation)
+        for permutation: list<string> in InsertItemAtAllPositions(l[0], sublistPermutation)
             ret += [permutation]
         endfor
     endfor
@@ -36,7 +36,7 @@ def InsertItemAtAllPositions( #{{{2
 
     var ret: list<list<string>>
     # iterate over all the positions at which we can insert the item in the list
-    for i in range(len(l) + 1)
+    for i: number in range(len(l) + 1)
         ret += [ (i == 0 ? [] : l[0 : i - 1]) + [item] + l[i : ] ]
     endfor
     return ret

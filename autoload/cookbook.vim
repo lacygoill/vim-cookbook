@@ -197,9 +197,11 @@ def cookbook#error(msg: string): bool #{{{2
 enddef
 #}}}1
 # Core {{{1
-def ShowMeTheCode(sources: list<any>) #{{{2
+def ShowMeTheCode(sources: list<dict<string>>) #{{{2
     var first_win_open: number
-    var i: number = 0 | for source in sources | ++i
+    var i: number = 0
+    for source: dict<string> in sources
+        ++i
         if IsAlreadyDisplayed(source.path)
             continue
         endif
@@ -294,12 +296,12 @@ enddef
 def CheckDb() #{{{2
     var report: list<string>
     # iterate over languages
-    for l in RECIPES->keys()
+    for l: string in RECIPES->keys()
         report += [l]
         # iterate over recipes in a given language
-        for r in RECIPES[l]
+        for r: string in RECIPES[l]
             # iterate over source files of a given recipe
-            for s in DB[l][r]['sources']
+            for s: dict<string> in DB[l][r]['sources']
                 var file: string = SROOTDIR .. '/' .. s.path
                 if !filereadable(file)
                     report += [printf('    %s: "%s" is not readable', r, file)]
